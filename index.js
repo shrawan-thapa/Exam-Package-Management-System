@@ -1,6 +1,6 @@
 const express = require('express');
 const config = require('config');
-const exams = require('./routes/exam')
+const routes = require('./routes')
 
 const app = express();
 
@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 app.use(express.static('public'));
-app.use('/exam', exams);
+app.use('/API', routes);
 
 
 //PORT
