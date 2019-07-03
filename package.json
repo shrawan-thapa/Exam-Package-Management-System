@@ -4,7 +4,8 @@
   "description": "Rabindra, don't you dare touch the backend stuff!!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index",
+    "dev": "nodemon index"
   },
   "repository": {
     "type": "git",
@@ -16,12 +17,14 @@
     "url": "https://github.com/iamshrawan/Exam-Package-Management-System/issues"
   },
   "homepage": "https://github.com/iamshrawan/Exam-Package-Management-System#readme",
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  },
   "dependencies": {
     "body-parser": "^1.19.0",
     "config": "^3.1.0",
     "express": "^4.17.1",
     "joi": "^14.3.1",
-    "mysql": "^2.17.1",
-    "nodemon": "^1.19.1"
+    "mysql": "^2.17.1"
   }
 }

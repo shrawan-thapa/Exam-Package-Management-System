@@ -1,6 +1,7 @@
 const express = require('express');
 const config = require('config');
 const routes = require('./routes')
+const test = require('./controller/edit')
 
 const app = express();
 
@@ -9,6 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
 app.use(express.static('public'));
 app.use('/API', routes);
+app.use('/api', test);
 
 
 //PORT
