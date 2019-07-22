@@ -8,13 +8,13 @@ pool.getConnection((err, connection) => {
   console.log("Database Connected");
 
   //Create Database
-  //   connection.query(
-  //     "CREATE DATABASE IF NOT EXISTS exam_package_management_system",
-  //     (err, result) => {
-  //       if (err) throw err;
-  //       console.log("Database Created");
-  //     }
-  //   );
+  connection.query(
+    "CREATE DATABASE IF NOT EXISTS exam_package_management_system",
+    (err, result) => {
+    if (err) throw err;
+    console.log("Database Created");
+    }
+  );
   const queryCreateDepartment = `CREATE TABLE IF NOT EXISTS department
   (id INT AUTO_INCREMENT PRIMARY KEY,
    departmentName VARCHAR(255))`;
