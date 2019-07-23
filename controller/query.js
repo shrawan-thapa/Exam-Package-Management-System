@@ -23,7 +23,7 @@ pool.getConnection((err, connection) => {
     });
 
     router.post('/newPackages', (req, res) =>{
-        const postNewPack = `INSERT INTO package(id, packageCode, noOfCopies, codeStart, codeEnd, examId, status) VALUES (${req.body.id}, '${req.body.packageCode}', ${req.body.noOfCopies}, '${req.body.codeStart}', '${req.body.codeEnd}', ${examID}, '${status}'`;
+        const postNewPack = `INSERT INTO package (id, packageCode, noOfCopies, codeStart, codeEnd, examID, status) VALUES (${req.body.id}, '${req.body.packageCode}', ${req.body.noOfCopies}, '${req.body.codeStart}', '${req.body.codeEnd}', ${req.body.examID}, '${req.body.status}')`;
         connection.query(postNewPack, (err, result)=>{
             if(err) throw err;
             else  {
@@ -45,7 +45,7 @@ pool.getConnection((err, connection) => {
     });
 
     router.post('/assign', (req, res)=>{
-        const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID) VALUES (${req.body.id}, '${req.dateOfAssignment}', '${dateOfSubmission}', ${noOfPackets}, ${packageID}, ${personID})`;
+        const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID) VALUES (${req.body.id}, '${req.body.dateOfAssignment}', '${req.body.dateOfSubmission}', ${req.body.noOfPackets}, ${req.body.packageID}, ${req.body.personID})`;
         connection.query(assignQ, (err, result)=>{
             if(err) throw err;
             else {
