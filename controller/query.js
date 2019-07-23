@@ -10,7 +10,7 @@ pool.getConnection((err, connection) => {
   router.post("/addExam", (req, res) => {
     const postExams = `INSERT INTO exam (id, syllabusID, examType, date) VALUES (${null}, ${
       req.body.syllabusID
-    }, ${req.body.examType},${req.body.date})`;
+    }, '${req.body.examType}','${req.body.date}')`;
     connection.query(postExams, (err, result) => {
       if (err) {
         console.log("Database Error");
@@ -51,9 +51,9 @@ pool.getConnection((err, connection) => {
 
   router.post("/addAssignment", (req, res) => {
     const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID) 
-    VALUES (${null}, ${req.body.dateOfAssignment}, ${
+    VALUES (${null}, '${req.body.dateOfAssignment}', '${
       req.body.dateOfSubmission
-    }, ${req.body.noOfPackets}, ${req.body.packageID}, ${req.body.personID})`;
+    }', ${req.body.noOfPackets}, ${req.body.packageID}, ${req.body.personID})`;
     connection.query(assignQ, (err, result) => {
       if (err) throw err;
       else {
