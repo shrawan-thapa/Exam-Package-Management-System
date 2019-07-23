@@ -31,7 +31,7 @@ router.get("/department", (req, res)=>{
     console.log("Database Connected");
 
     //Create Database
-    connection.query("SELECT * from department", (err, result, fields) => {
+    connection.query("SELECT id, departmentName from department", (err, result, fields) => {
       if (err) throw err;
       console.log(result);
       //   console.log(fields);
