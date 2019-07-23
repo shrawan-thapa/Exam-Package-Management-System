@@ -25,6 +25,22 @@ router.get("/exam", (req, res) => {
   });
 });
 
+router.get("/department", (req, res)=>{
+  pool.getConnection((err, connection) => {
+    if (err) throw err;
+    console.log("Database Connected");
+
+    //Create Database
+    connection.query("SELECT * from department", (err, result, fields) => {
+      if (err) throw err;
+      console.log(result);
+      //   console.log(fields);
+      res.send(JSON.parse(JSON.stringify(result)));
+    });
+    connection.release();
+  });
+});
+
 router.get("/", (req, res) => {
   res.send("Hello World");
 });
@@ -39,6 +55,8 @@ router.get("/package/:id", (req, res) => {
   res.send(course);
 });
 
-router.post("/exam/package", (req, res) => {});
+router.post("/exam/package", (req, res) => {
+  
+});
 
 module.exports = router;
