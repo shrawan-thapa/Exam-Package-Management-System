@@ -1,106 +1,45 @@
 const express = require("express");
-const { pool } = require("../middlewares/database");
+const { pool } = require("../database");
 
 const router = express.Router();
 
 pool.getConnection((err, connection) => {
-  if (err) throw err;
-  console.log("Database Connected");
-
-  //Create Database
-  //   connection.query(
-  //     "CREATE DATABASE IF NOT EXISTS exam_package_management_system",
-  //     (err, result) => {
-  //       if (err) throw err;
-  //       console.log("Database Created");
-  //     }
-  //   );
-  const queryCreateDepartment = `CREATE TABLE IF NOT EXISTS department
-  (id INT AUTO_INCREMENT PRIMARY KEY,
-   departmentName VARCHAR(255))`;
-  connection.query(queryCreateDepartment, (err, result) => {
     if (err) throw err;
-    console.log("Table department created");
+    console.log("Database Connected");
+  
+    
+    router.post('/exams', (req, res) =>{
+        const postExams = `INSERT INTO exam (id, syllabusID, examType, date) VALUES (${req.body.id}, ${req.body.subjectID}, ${req.body.examType},${req.body.date})`;
+        connection.query(postExams, (err, result)=>{
+            if(err) throw err;
+            else console.log(`Inserted data in exams ${result}`);
+        });
+    });
+
+    router.post('/newPackages', (req, res) =>{
+        const postNewPack = `INSERT INTO package(id, packageCode, noOfCopies, codeStart, codeEnd, examId, status) VALUES (${req.body.id}, ${req.body.packageCode}, ${req.body.noOfCopies}, ${req.body.codeStart}, ${req.body.codeEnd}, ${examID}, ${status}`;
+        connection.query(postNewPack, (err, result)=>{
+            if(err) throw err;
+            else console.log(`Inserted data in packages ${result}`);
+        });
+    });
+
+    router.post('/addPerson', (req, res) =>{
+        const newPerson = `INSERT INTO person(id, name, contact, address) VALUES (${req.body.id}, ${req.body.name}, ${req.body.contact}, ${req.body.address})`;
+        connection.query(newPerson, (err, result)=>{
+            if(err) throw err;
+            else console.log(`Inserted data in person ${result}`);
+        });
+    });
+
+    router.post('/assign', (req, res)=>{
+        const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID) VALUES (${req.body.id}, ${req.dateOfAssignment}, ${dateOfSubmission}, ${noOfPackets}, ${packageID}, ${personID})`;
+        connection.query(assignQ, (err, result)=>{
+            if(err) throw err;
+            else console.log(`Inserted data in assignment ${result}`);
+        });
+    })
+
+    connection.release();
   });
-
-  const queryCreateProgram = `CREATE TABLE IF NOT EXISTS program
-  (id INT AUTO_INCREMENT PRIMARY KEY,
-   programName VARCHAR(255),
-   departmentID INT,
-   Foreign KEY (departmentID) references department(id)
-   )`;
-  connection.query(queryCreateProgram, (err, result) => {
-    if (err) throw err;
-    console.log("Table program created");
-  });
-
-  const queryCreateSyllabus = `CREATE TABLE IF NOT EXISTS syllabus
-  (id INT AUTO_INCREMENT PRIMARY KEY,
-    subjectCode VARCHAR(255),
-    year ENUM('First', 'Second','Third','Fourth'),
-    part ENUM('First', 'Second'),
-    programID INT,
-    Foreign KEY (programID) references program(id)
-   )`;
-  connection.query(queryCreateSyllabus, (err, result) => {
-    if (err) throw err;
-    console.log("Table syllabus created");
-  });
-
-  const queryCreateExam = `CREATE TABLE IF NOT EXISTS exam
-   (id INT AUTO_INCREMENT PRIMARY KEY,
-    syllabusID INT, 
-    examType VARCHAR(255), 
-    date VARCHAR(12),
-    Foreign KEY (syllabusID) references syllabus(id))`;
-  connection.query(queryCreateExam, (err, result) => {
-    if (err) throw err;
-    console.log("Table exam created");
-  });
-
-  const queryCreatePackage = `CREATE TABLE IF NOT EXISTS package
-  (id INT AUTO_INCREMENT PRIMARY KEY, 
-    packageCode VARCHAR(255),
-   noOfCopies INT, 
-   codeStart VARCHAR(255), 
-   codeEnd VARCHAR(255),
-   examID INT ,
-   Foreign KEY (examID) references exam(id) , 
-   status ENUM('Not assigned','Pending', 'Submitted'))`;
-  connection.query(queryCreatePackage, (err, result) => {
-    if (err) throw err;
-    console.log("Table package created");
-  });
-
-  const queryCreatePerson = `CREATE TABLE IF NOT EXISTS person
-  (id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255), 
-    contact VARCHAR(10), 
-    address VARCHAR(255)
-  )`;
-  connection.query(queryCreatePerson, (err, result) => {
-    if (err) throw err;
-    console.log("Table person created");
-  });
-
-  const queryCreateAss = `CREATE TABLE IF NOT EXISTS assignment
-   (id INT AUTO_INCREMENT PRIMARY KEY, 
-   dateOfAssignment VARCHAR(12), 
-   dateOfSubmission VARCHAR(12), 
-   noOfPackets INT, 
-   packageID INT,
-   personID INT,
-   Foreign KEY (personID) references person(id),
-   Foreign KEY (packageID) references package(id))`;
-  connection.query(queryCreateAss, (err, result) => {
-    if (err) throw err;
-    console.log("Table assignment created");
-  });
-
-  connection.release();
-});
-
 module.exports = router;
-
-
-

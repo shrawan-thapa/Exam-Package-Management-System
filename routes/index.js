@@ -5,4 +5,5 @@ const router = express.Router();
 
 router.use('/query', query);
 
+
 module.exports = router;
