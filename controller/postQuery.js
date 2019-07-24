@@ -124,7 +124,7 @@ pool.getConnection((err, connection) => {
   );
 
   router.post("/addAssignment", (req, res) => {
-    const packageIDs = req.body.packageID;
+    const packageIDs = req.body.packages;
     insertList = packageIDs.map(element => {
         return [null, req.body.dateOfAssignment, req.body.dateOfSubmission, req.body.noOfPackets,
             element, req.body.personID
