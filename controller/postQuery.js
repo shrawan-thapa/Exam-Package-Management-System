@@ -124,11 +124,20 @@ pool.getConnection((err, connection) => {
   );
 
   router.post("/addAssignment", (req, res) => {
+    const packageIDs = req.body.packageID;
+    insertList = packageIDs.map(element => {
+        return [null, req.body.dateOfAssignment, req.body.dateOfSubmission, req.body.noOfPackets,
+            element, req.body.personID
+        ]
+    });
+    console.log(insertList);
+    // const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID) 
+    // VALUES (${null}, '${req.body.dateOfAssignment}', '${
+    //   req.body.dateOfSubmission
+    // }', ${req.body.noOfPackets}, ${req.body.packageID}, ${req.body.personID})`;
     const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID) 
-    VALUES (${null}, '${req.body.dateOfAssignment}', '${
-      req.body.dateOfSubmission
-    }', ${req.body.noOfPackets}, ${req.body.packageID}, ${req.body.personID})`;
-    connection.query(assignQ, (err, result) => {
+    VALUES ?`;
+    connection.query(assignQ, [insertList], (err, result) => {
       if (err) throw err;
       else {
         console.log(`Inserted data in assignment ${result}`);
