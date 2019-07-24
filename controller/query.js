@@ -68,12 +68,27 @@ pool.getConnection((err, connection) => {
                 console.log("Pending Packages returned");
                 res.status(200).send(JSON.parse(JSON.stringify(result)));
             }
-        })
+        });
+    })
 
     router.get('/getAssignments', (req, res)=>{
-        const assignedQuery = ``
-    })
+        const assignedQuery = `SELECT person.id, name, contact, address, packageCode, noOfPackets, dateOfAssignment, status
+        FROM person JOIN
+        (
+            SELECT a.id, dateOfAssignment, dateOfSubmission, noOfPackets, personID, packageCode, status
+            FROM assignment as a JOIN package as p 
+            ON a.packageID=p.id
+        ) AS asgn
+        ON person.id = asgn.personID`;
+        connection.query(assignedQuery, (err, result)=>{
+            if(err) throw err;
+            else{
+                console.log("Assignments returned!!");
+                res.status(200).send(JSON.parse(JSON.stringify(result)));
+            }
+        });
     });
+
 
     connection.release();
   });
