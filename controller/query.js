@@ -61,7 +61,7 @@ pool.getConnection((err, connection) => {
             SELECT exam.id, syllabus.subjectCode, exam.examType, exam.date FROM exam JOIN syllabus 
             ON exam.syllabusID=syllabus.id
         ) AS sub_exam 
-        ON package.examID=sub_exam.id`;
+        ON package.examID=sub_exam.id WHERE status='Pending'`;
         connection.query(pendingPackagequery, (err, result)=>{
             if(err) throw err;
             else{
