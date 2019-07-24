@@ -55,6 +55,22 @@ pool.getConnection((err, connection) => {
         });
     })
 
+    router.get('/pendingPackages',(req,res)=>{
+        const pendingPackagequery = `SELECT package.id, packageCode, noOfCopies, codeStart, codeEnd, subjectCode, examType, date, status FROM package JOIN 
+        (
+            SELECT exam.id, syllabus.subjectCode, exam.examType, exam.date FROM exam JOIN syllabus 
+            ON exam.syllabusID=syllabus.id
+        ) AS sub_exam 
+        ON package.examID=sub_exam.id`;
+        connection.query(pendingPackagequery, (err, result)=>{
+            if(err) throw err;
+            else{
+                console.log("Pending Packages returned");
+                res.status(200).send(JSON.parse(JSON.stringify(result)));
+            }
+        })
+    });
+
     connection.release();
   });
 module.exports = router;
