@@ -56,12 +56,16 @@ pool.getConnection((err, connection) => {
     })
 
     router.get('/pendingPackages',(req,res)=>{
-        const pendingPackagequery = `SELECT package.id, packageCode, noOfCopies, codeStart, codeEnd, subjectCode, examType, date FROM package JOIN 
+        const pendingPackagequery = `SELECT packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofSubmission as tobeSubmitted
+        FROM person JOIN 
         (
-            SELECT exam.id, syllabus.subjectCode, exam.examType, exam.date FROM exam JOIN syllabus 
-            ON exam.syllabusID=syllabus.id
-        ) AS sub_exam 
-        ON package.examID=sub_exam.id WHERE status='Pending'`;
+            SELECT dateofAssignment, dateofSubmission, packageCode, personID FROM
+            assignment JOIN package
+            ON packageID = package.id
+            WHERE status="Pending"
+        ) AS assn
+        ON person.id = assn.personID`;
+        
         connection.query(pendingPackagequery, (err, result)=>{
             if(err) throw err;
             else{
