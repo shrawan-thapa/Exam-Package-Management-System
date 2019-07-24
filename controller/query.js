@@ -141,6 +141,28 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.get("/getPerson", (req, res) => {
+      const getAllPerson = `SELECT * FROM person`;
+      connection.query(getAllPerson, (err, result) => {
+        if (err) throw err;
+        else {
+          console.log("All Person returned!!");
+          res.status(200).send(JSON.parse(JSON.stringify(result)));
+        }
+      });
+  });
+
+  router.get("/getOnePerson/:id", (req, res) => {
+    const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id}`;
+    connection.query(getOnePerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("One Person returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+});
+
   connection.release();
 });
 module.exports = router;
