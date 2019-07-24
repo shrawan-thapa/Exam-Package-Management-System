@@ -56,7 +56,7 @@ pool.getConnection((err, connection) => {
     })
 
     router.get('/pendingPackages',(req,res)=>{
-        const pendingPackagequery = `SELECT package.id, packageCode, noOfCopies, codeStart, codeEnd, subjectCode, examType, date, status FROM package JOIN 
+        const pendingPackagequery = `SELECT package.id, packageCode, noOfCopies, codeStart, codeEnd, subjectCode, examType, date FROM package JOIN 
         (
             SELECT exam.id, syllabus.subjectCode, exam.examType, exam.date FROM exam JOIN syllabus 
             ON exam.syllabusID=syllabus.id
@@ -69,6 +69,10 @@ pool.getConnection((err, connection) => {
                 res.status(200).send(JSON.parse(JSON.stringify(result)));
             }
         })
+
+    router.get('/getAssignments', (req, res)=>{
+        const assignedQuery = ``
+    })
     });
 
     connection.release();
