@@ -80,6 +80,26 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.get("/getSubjectPackage/:scode", (req, res)=>{
+    const getSubjectPackage = `SELECT packageCode FROM package JOIN
+    (
+        SELECT exam.id FROM 
+        exam JOIN syllabus
+        ON syllabusID = syllabus.id
+        WHERE subjectCode="${req.params.scode}"
+    ) as t 
+    ON examID=t.id`
+
+    connection.query(getSubjectPackage, (err, result)=>{
+      if(err) throw err;
+      else{
+        console.log("Succeded")
+        res.status(200).send(JSON.parse(JSON.stringify(result)))
+      }
+    });
+  
+  });
+
   connection.release();
 });
 module.exports = router;
