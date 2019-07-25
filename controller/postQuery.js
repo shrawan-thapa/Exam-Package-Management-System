@@ -65,9 +65,9 @@ pool.getConnection((err, connection) => {
         .not()
         .isEmpty(),
       // check('examID').exists(),
-      check("status")
-        .exists()
-        .isIn(["Not assigned", "Pending", "Submitted"])
+      //check("status")
+        //.exists()
+        //.isIn(["Not assigned", "Pending", "Submitted"])
     ],
     (req, res) => {
       const errors = validationResult(req);
@@ -79,7 +79,7 @@ pool.getConnection((err, connection) => {
         codeEnd, examID, status) VALUES 
         (${null}, '${req.body.packageCode}', ${req.body.noOfCopies}, '${
         req.body.codeStart
-      }', '${req.body.codeEnd}', ${req.body.examID}, '${req.body.status}')`;
+      }', '${req.body.codeEnd}', ${req.body.examID}, 'Not Assigned')`;
       connection.query(postNewPack, (err, result) => {
         if (err) throw err;
         else {
