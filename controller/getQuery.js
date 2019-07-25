@@ -100,6 +100,29 @@ pool.getConnection((err, connection) => {
   
   });
 
+  router.get("/getSubjectList", (req, res) => {
+    const getAllPerson = `SELECT subjectCode, year, part, programName FROM syllabus JOIN program
+    ON programID=program.id`;
+    connection.query(getAllPerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Subject List returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
+  router.get("/getDepartmentList", (req, res) => {
+    const getAllPerson = `SELECT * FROM department`;
+    connection.query(getAllPerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Subject List returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
   connection.release();
 });
 module.exports = router;
