@@ -19,6 +19,7 @@ createDB = function(req, res, next){
     const queryCreateProgram = `CREATE TABLE IF NOT EXISTS program
     (id INT AUTO_INCREMENT PRIMARY KEY,
      programName VARCHAR(255),
+     academicDegree ENUM('Bachelors', 'Masters'),
      departmentID INT,
      Foreign KEY (departmentID) references department(id)
      )`;
@@ -27,15 +28,16 @@ createDB = function(req, res, next){
       console.log("Table program created");
     });
   
-    const queryCreateSyllabus = `CREATE TABLE IF NOT EXISTS syllabus
+    const queryCreateSubject = `CREATE TABLE IF NOT EXISTS subject
     (id INT AUTO_INCREMENT PRIMARY KEY,
-      subjectCode VARCHAR(255),
+      courseCode VARCHAR(255),
       year ENUM('First', 'Second','Third','Fourth'),
+      subjectName VARCHAR(255),
       part ENUM('First', 'Second'),
       programID INT,
       Foreign KEY (programID) references program(id)
      )`;
-    connection.query(queryCreateSyllabus, (err, result) => {
+    connection.query(queryCreateSubject, (err, result) => {
       if (err) throw err;
       console.log("Table syllabus created");
     });
@@ -45,7 +47,7 @@ createDB = function(req, res, next){
       syllabusID INT, 
       examType VARCHAR(255), 
       date VARCHAR(12),
-      Foreign KEY (syllabusID) references syllabus(id))`;
+      Foreign KEY (syllabusID) references subject(id))`;
     connection.query(queryCreateExam, (err, result) => {
       if (err) throw err;
       console.log("Table exam created");
@@ -69,8 +71,16 @@ createDB = function(req, res, next){
     (id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255), 
       contact VARCHAR(10), 
-      address VARCHAR(255)
-    )`;
+      courseCode VARCHAR(255),
+      programme VARCHAR(255),
+      year_part VARCHAR(255),
+      subject VARCHAR(255),
+      campus VARCHAR(255),
+      teachingExperience VARCHAR(255),
+      experienceinthisSubj VARCHAR(255),
+      academicQualification VARCHAR(255),
+      jobType VARCHAR(255),
+      email VARCHAR(255))`;
     connection.query(queryCreatePerson, (err, result) => {
       if (err) throw err;
       console.log("Table person created");
