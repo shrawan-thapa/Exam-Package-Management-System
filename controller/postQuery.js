@@ -53,8 +53,6 @@ pool.getConnection((err, connection) => {
         .isEmpty(),
       check("noOfCopies")
         .exists()
-        .not()
-        .isEmpty()
         .isNumeric(),
       check("codeStart")
         .exists()
