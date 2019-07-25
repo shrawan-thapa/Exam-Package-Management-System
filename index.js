@@ -29,10 +29,5 @@ app.use(express.static("public"));
 app.use("/API", routes);
 
 //PORT
-<<<<<<< HEAD
-const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Listening on port ${port}`));
-=======
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
->>>>>>> origin/master
