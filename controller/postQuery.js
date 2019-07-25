@@ -1,6 +1,8 @@
 const express = require("express");
 const { pool } = require("../database");
 const { check, validationResult } = require("express-validator");
+const xlReader = require("xlsx");
+const xlParser = require('../xlParser');
 
 const router = express.Router();
 
@@ -142,6 +144,34 @@ pool.getConnection((err, connection) => {
         res.status(200).send(result);
       }
     });
+  });
+  //obj[0]["result on date"]
+
+router.post("/postExcel", (req, res)=>{
+    const xlFile = xlReader.readFile(process.cwd()+"/excelFile/TeacherList.xlsx");
+    console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
+    const JsonObj = xlParser(xlFile);
+    const JsonArray = JsonObj.ALL;
+
+    
+    for(let i = 0; i < JsonArray.length; i++){
+  const newPerson = `INSERT INTO person(id, name, contact, courseCode,
+  programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
+  jobType, email) VALUES 
+    (${null}, '${JsonArray[i]["Name of Teacher"]}', '${JsonArray[i]["Mobile No."]}', '${JsonArray[i]["Course Code"]}',
+    '${JsonArray[i]["Programe"]}', '${JsonArray[i]["Year/Part"]}', '${JsonArray[i]["Subject"]}', '${JsonArray[i]["1 Campus Code"]}',
+     '${JsonArray[i]["Teaching Experience"]}', '${JsonArray[i]["Eff. Exp. On this Subj. "]}','${JsonArray[i]["Academic Qualification"]}',
+      '${JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]}', '${JsonArray[i]["Email"]}')`;
+      connection.query(newPerson, (err, result) => {
+        if (err) throw err;
+        else {
+          console.log(`Inserted data in person ${result}`);
+          //res.status(200).send(result);
+        }
+      });
+    
+    }
+    
   });
 
   connection.release();
