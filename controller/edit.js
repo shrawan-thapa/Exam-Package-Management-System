@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { pool } = require("../middlewares/database");
+const { pool } = require("../database");
 
 const courses = [
   { id: 1, name: "course1" },
