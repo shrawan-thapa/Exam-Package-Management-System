@@ -102,7 +102,7 @@ createDB = function(req, res, next){
   
     connection.release();
   });
-  next();
+//   next();
 }
 
 module.exports = createDB;
