@@ -44,10 +44,10 @@ createDB = function(req, res, next){
   
     const queryCreateExam = `CREATE TABLE IF NOT EXISTS exam
      (id INT AUTO_INCREMENT PRIMARY KEY,
-      syllabusID INT, 
+      subjectID INT, 
       examType VARCHAR(255), 
       date VARCHAR(12),
-      Foreign KEY (syllabusID) references subject(id))`;
+      Foreign KEY (subjectID) references subject(id))`;
     connection.query(queryCreateExam, (err, result) => {
       if (err) throw err;
       console.log("Table exam created");
