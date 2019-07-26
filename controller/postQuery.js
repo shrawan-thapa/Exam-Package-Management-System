@@ -75,7 +75,7 @@ pool.getConnection((err, connection) => {
         codeEnd, examID, status) VALUES 
         (${null}, '${req.body.packageCode}', ${req.body.noOfCopies}, '${
         req.body.codeStart
-      }', '${req.body.codeEnd}', ${req.body.examID}, '${status}')`;
+      }', '${req.body.codeEnd}', ${req.body.examID}, 'Not Assigned')`;
       connection.query(postNewPack, (err, result) => {
         if (err) throw err;
         else {
