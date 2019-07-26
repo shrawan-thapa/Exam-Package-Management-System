@@ -13,7 +13,7 @@ pool.getConnection((err, connection) => {
   router.post(
     "/addExam",
     [
-      check("syllabusID")
+      check("subjectID")
         .exists()
         .not()
         .isEmpty(),
@@ -31,8 +31,8 @@ pool.getConnection((err, connection) => {
         return res.status(422).json({ errors: errors.array() });
       }
 
-      const postExams = `INSERT INTO exam (id, syllabusID, examType, date) VALUES (${null}, ${
-        req.body.syllabusID
+      const postExams = `INSERT INTO exam (id, subjectID, examType, date) VALUES (${null}, ${
+        req.body.subjectID
       }, '${req.body.examType}','${req.body.date}')`;
       connection.query(postExams, (err, result) => {
         if (err) {

@@ -46,8 +46,8 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getExams", (req, res) => {
-    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, subjectCode, year, part, programName 
-          FROM exam JOIN (syllabus JOIN program ON programID=program.id) ON syllabusID = syllabus.id`;
+    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
+          FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id`;
 
     connection.query(examGetterQuery, (err, result) => {
       if (err) throw err;
@@ -84,8 +84,8 @@ pool.getConnection((err, connection) => {
     const getSubjectPackage = `SELECT packageCode FROM package JOIN
     (
         SELECT exam.id FROM 
-        exam JOIN syllabus
-        ON syllabusID = syllabus.id
+        exam JOIN subject
+        ON subjectID = subject.id
         WHERE subjectCode="${req.params.scode}"
     ) as t 
     ON examID=t.id`
@@ -101,7 +101,7 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getSubjectList", (req, res) => {
-    const getAllPerson = `SELECT subjectCode, year, part, programName FROM syllabus JOIN program
+    const getAllPerson = `SELECT subject.id,subjectName,courseCode, year, part, programName FROM subject JOIN program
     ON programID=program.id`;
     connection.query(getAllPerson, (err, result) => {
       if (err) throw err;
@@ -122,6 +122,27 @@ pool.getConnection((err, connection) => {
       }
     });
   });
+  router.get("/getProgramList", (req, res) => {
+    const getAllPerson = `SELECT * FROM program`;
+    connection.query(getAllPerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Subject List returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+  router.get("/getPackageList", (req, res) => {
+    const getAllPerson = `SELECT * FROM package`;
+    connection.query(getAllPerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Subject List returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
 
   connection.release();
 });
