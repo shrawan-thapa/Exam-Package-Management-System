@@ -3,12 +3,16 @@ const { pool } = require("../database");
 const { check, validationResult } = require("express-validator");
 const xlReader = require("xlsx");
 const xlParser = require('../xlParser');
-
+const http = require('http')
+const fetch = require('node-fetch')
 const router = express.Router();
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
+
+
+
 
   router.post(
     "/addExam",
@@ -40,7 +44,13 @@ pool.getConnection((err, connection) => {
           throw err;
         } else {
           console.log(`Inserted data in exams ${result}`);
-          res.status(200).json(Object.assign(req.body, {id:result.insertId}));
+          fetch(`http://localhost:4000/API/query/getExams/${result.insertId}`)
+          .then(res=>res.json())
+          .then(json=>{
+            console.log(json)
+            res.status(200).json({'exams':json});
+          });
+          
         }
       });
     }
