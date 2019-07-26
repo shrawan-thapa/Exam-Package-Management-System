@@ -2,18 +2,22 @@ const express = require("express");
 const { pool } = require("../database");
 const { check, validationResult } = require("express-validator");
 const xlReader = require("xlsx");
-const xlParser = require("../xlParser");
-
+const xlParser = require('../xlParser');
+const http = require('http')
+const fetch = require('node-fetch')
 const router = express.Router();
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
 
+
+
+
   router.post(
     "/addExam",
     [
-      check("syllabusID")
+      check("subjectID")
         .exists()
         .not()
         .isEmpty(),
@@ -31,8 +35,8 @@ pool.getConnection((err, connection) => {
         return res.status(422).json({ errors: errors.array() });
       }
 
-      const postExams = `INSERT INTO exam (id, syllabusID, examType, date) VALUES (${null}, ${
-        req.body.syllabusID
+      const postExams = `INSERT INTO exam (id, subjectID, examType, date) VALUES (${null}, ${
+        req.body.subjectID
       }, '${req.body.examType}','${req.body.date}')`;
       connection.query(postExams, (err, result) => {
         if (err) {
@@ -40,7 +44,13 @@ pool.getConnection((err, connection) => {
           throw err;
         } else {
           console.log(`Inserted data in exams ${result}`);
-          res.status(200).send(result);
+          fetch(`http://localhost:4000/API/query/getExams/${result.insertId}`)
+          .then(res=>res.json())
+          .then(json=>{
+            console.log(json)
+            res.status(200).json({'exams':json});
+          });
+          
         }
       });
     }
@@ -75,12 +85,13 @@ pool.getConnection((err, connection) => {
         codeEnd, examID, status) VALUES 
         (${null}, '${req.body.packageCode}', ${req.body.noOfCopies}, '${
         req.body.codeStart
-      }', '${req.body.codeEnd}', ${req.body.examID}, '${status}')`;
+      }', '${req.body.codeEnd}', ${req.body.examID}, 'Not Assigned')`;
       connection.query(postNewPack, (err, result) => {
         if (err) throw err;
         else {
           console.log(`Inserted data in packages ${result}`);
-          res.status(200).json(req.body);
+          console.log(result.insertId);
+          res.status(200).json(Object.assign(req.body, {id:result.insertId}));
         }
       });
     }
@@ -113,7 +124,7 @@ pool.getConnection((err, connection) => {
         if (err) throw err;
         else {
           console.log(`Inserted data in person ${result}`);
-          res.status(200).send(result);
+          res.status(200).json(Object.assign(req.body, {id:result.insertId}));
         }
       });
     }
@@ -146,7 +157,7 @@ pool.getConnection((err, connection) => {
       if (err) throw err;
       else {
         console.log(`Inserted data in assignment ${result}`);
-        res.status(200).send(result);
+        res.status(200).json(Object.assign(req.body, {id:result.insertId}));
       }
     });
   });
