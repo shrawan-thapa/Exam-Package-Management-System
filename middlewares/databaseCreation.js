@@ -45,7 +45,7 @@ createDB = function(req, res, next){
     const queryCreateExam = `CREATE TABLE IF NOT EXISTS exam
      (id INT AUTO_INCREMENT PRIMARY KEY,
       subjectID INT, 
-      examType VARCHAR(255), 
+      examType ENUM('Regular', 'Back'), 
       date VARCHAR(12),
       Foreign KEY (subjectID) references subject(id))`;
     connection.query(queryCreateExam, (err, result) => {
@@ -61,7 +61,7 @@ createDB = function(req, res, next){
      codeEnd VARCHAR(255),
      examID INT ,
      Foreign KEY (examID) references exam(id) , 
-     status ENUM('Not assigned','Pending', 'Submitted'))`;
+     status ENUM('Not Assigned','Pending', 'Submitted'))`;
     connection.query(queryCreatePackage, (err, result) => {
       if (err) throw err;
       console.log("Table package created");
@@ -89,8 +89,8 @@ createDB = function(req, res, next){
     const queryCreateAss = `CREATE TABLE IF NOT EXISTS assignment
      (id INT AUTO_INCREMENT PRIMARY KEY, 
      dateOfAssignment VARCHAR(12), 
-     dateOfSubmission VARCHAR(12), 
-     noOfPackets INT, 
+     dateOfSubmission VARCHAR(12),
+     dateOfDeadline VARCHAR(12), 
      packageID INT,
      personID INT,
      Foreign KEY (personID) references person(id),
@@ -106,8 +106,6 @@ createDB = function(req, res, next){
 }
 
 module.exports = createDB;
-
-//module.exports = router;
 
 
 

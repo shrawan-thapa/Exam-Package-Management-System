@@ -57,6 +57,20 @@ pool.getConnection((err, connection) => {
       }
     });
   });
+  router.get("/getExams/:id", (req, res) => {
+    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
+          FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id WHERE exam.id = '${req.params.id}'`;
+
+    connection.query(examGetterQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Exams returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
+
 
   router.get("/getPerson", (req, res) => {
     const getAllPerson = `SELECT * FROM person`;
@@ -69,10 +83,10 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getPackages", (req, res) => {
-    const getPack = `SELECT packageCode, programName, year, part, courseCode, date FROM package as p JOIN exam as
+  router.get('/getPackages', (req, res) => {
+    const getPack = `SELECT packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName,status FROM package as p JOIN exam as
      e on p.examID = e.id JOIN subject as s ON
-     e.syllabusID = s.id JOIN program as pr on pr.id = s.programID`;
+     e.subjectID = s.id JOIN program as pr on pr.id = s.programID`;
 
      connection.query(getPack, (err, result) => {
       if (err) throw err;
@@ -84,7 +98,7 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getOnePerson/:id", (req, res) => {
-    const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id}`;
+    const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id} `;
     connection.query(getOnePerson, (err, result) => {
       if (err) throw err;
       else {
@@ -98,8 +112,8 @@ pool.getConnection((err, connection) => {
     const getSubjectPackage = `SELECT packageCode FROM package JOIN
     (
         SELECT exam.id FROM 
-        exam JOIN syllabus
-        ON syllabusID = syllabus.id
+        exam JOIN subject
+        ON subjectID = subject.id
         WHERE subjectCode="${req.params.scode}"
     ) as t 
     ON examID=t.id`;
@@ -114,7 +128,7 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getSubjectList", (req, res) => {
-    const getAllPerson = `SELECT courseCode, year, part, programName FROM subject JOIN program
+    const getAllPerson = `SELECT subject.id,subjectName,courseCode, year, part, programName FROM subject JOIN program
     ON programID=program.id`;
     connection.query(getAllPerson, (err, result) => {
       if (err) throw err;
@@ -127,6 +141,16 @@ pool.getConnection((err, connection) => {
 
   router.get("/getDepartmentList", (req, res) => {
     const getAllPerson = `SELECT * FROM department`;
+    connection.query(getAllPerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Subject List returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+  router.get("/getProgramList", (req, res) => {
+    const getAllPerson = `SELECT * FROM program`;
     connection.query(getAllPerson, (err, result) => {
       if (err) throw err;
       else {
