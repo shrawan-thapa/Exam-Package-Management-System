@@ -40,7 +40,7 @@ pool.getConnection((err, connection) => {
           throw err;
         } else {
           console.log(`Inserted data in exams ${result}`);
-          res.status(200).send(result);
+          res.status(200).json(Object.assign(req.body, {id:result.insertId}));
         }
       });
     }
@@ -80,7 +80,8 @@ pool.getConnection((err, connection) => {
         if (err) throw err;
         else {
           console.log(`Inserted data in packages ${result}`);
-          res.status(200).json(req.body);
+          console.log(result.insertId);
+          res.status(200).json(Object.assign(req.body, {id:result.insertId}));
         }
       });
     }
@@ -113,7 +114,7 @@ pool.getConnection((err, connection) => {
         if (err) throw err;
         else {
           console.log(`Inserted data in person ${result}`);
-          res.status(200).send(result);
+          res.status(200).json(Object.assign(req.body, {id:result.insertId}));
         }
       });
     }
@@ -146,7 +147,7 @@ pool.getConnection((err, connection) => {
       if (err) throw err;
       else {
         console.log(`Inserted data in assignment ${result}`);
-        res.status(200).send(result);
+        res.status(200).json(Object.assign(req.body, {id:result.insertId}));
       }
     });
   });

@@ -74,7 +74,7 @@ pool.getConnection((err, connection) => {
      e on p.examID = e.id JOIN subject as s ON
      e.syllabusID = s.id JOIN program as pr on pr.id = s.programID`;
 
-    connection.query(getPack, (err, result) => {
+     connection.query(getPack, (err, result) => {
       if (err) throw err;
       else {
         console.log("All Pack returned!!");
