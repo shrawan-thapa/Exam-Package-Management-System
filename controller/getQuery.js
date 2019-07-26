@@ -132,17 +132,6 @@ pool.getConnection((err, connection) => {
       }
     });
   });
-  router.get("/getPackageList", (req, res) => {
-    const getAllPerson = `SELECT * FROM package`;
-    connection.query(getAllPerson, (err, result) => {
-      if (err) throw err;
-      else {
-        console.log("Subject List returned!!");
-        res.status(200).send(JSON.parse(JSON.stringify(result)));
-      }
-    });
-  });
-
 
   connection.release();
 });
