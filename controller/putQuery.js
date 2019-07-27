@@ -7,21 +7,46 @@ const router = express.Router();
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
+  router.put("/updateSubmission", (req, res) => {
+    const updateSubmission = `UPDATE assignment JOIN package ON assignment.packageID=package.id
+    SET assignment.dateOfSubmission="${req.body.dateOfSubmission}", 
+    package.status="Submitted"
+    WHERE assignment.id="${req.body.id}"`;
 
-  router.put("/updateSubmission", (req, res)=>{
-    updateSubmission=`UPDATE assignment JOIN package ON packageID=package.id
-    SET dateOfSubmission="${req.body.dateOfSubmission}", status="${req.body.status}"
-    WHERE status="Pending" AND packageCode="${req.body.packageCode}"`
-
-    connection.query(updateSubmission, (err, result)=>{
-      if(err) throw err;
-      else{
+    connection.query(updateSubmission, (err, result) => {
+      if (err) throw err;
+      else {
         console.log("Submission Completed!!");
-        res.status(200).send(result)
+        res.status(200).send(result);
       }
     });
   });
-  connection.release();
 
+  router.put("/editPerson", (req, res) => {
+    const editPersonQuery = `UPDATE person
+    SET name="${req.body.name}",
+    contact="${req.body.contact}",
+    courseCode="${req.body.courseCode}",
+    programme="${req.body.programme}",
+    year_part="${req.body.year_part}",
+    subject="${req.body.subject}",
+    campus="${req.body.campus}",
+    teachingExperience="${req.body.teachingExperience}",
+    experienceinthisSubj="${req.body.experienceinthisSubj}",
+    academicQualification="${req.body.academicQualification}",
+    jobType="${req.body.jobType}",
+    email="${req.body.email}",
+    
+    `;
+    connection.query(editPersonQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Updated person");
+        res.status(200).send(req.body);
+      }
+    });
+  });
+
+  connection.release();
 });
 module.exports = router;
