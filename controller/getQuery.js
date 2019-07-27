@@ -47,7 +47,7 @@ pool.getConnection((err, connection) => {
 
   router.get("/getExams", (req, res) => {
     const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
-          FROM exam JOIN (subject JOIN program ON programID=program.id) ON syllabusID = subject.id`;
+          FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id`;
 
     connection.query(examGetterQuery, (err, result) => {
       if (err) throw err;
@@ -59,7 +59,9 @@ pool.getConnection((err, connection) => {
   });
   router.get("/getExams/:id", (req, res) => {
     const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
-          FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id WHERE exam.id = '${req.params.id}'`;
+          FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id WHERE exam.id = '${
+            req.params.id
+          }'`;
 
     connection.query(examGetterQuery, (err, result) => {
       if (err) throw err;
@@ -69,8 +71,6 @@ pool.getConnection((err, connection) => {
       }
     });
   });
-
-
 
   router.get("/getPerson", (req, res) => {
     const getAllPerson = `SELECT * FROM person`;
@@ -83,12 +83,12 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get('/getPackages', (req, res) => {
+  router.get("/getPackages", (req, res) => {
     const getPack = `SELECT p.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName,status FROM package as p JOIN exam as
      e on p.examID = e.id JOIN subject as s ON
      e.subjectID = s.id JOIN program as pr on pr.id = s.programID`;
 
-     connection.query(getPack, (err, result) => {
+    connection.query(getPack, (err, result) => {
       if (err) throw err;
       else {
         console.log("All Pack returned!!");
