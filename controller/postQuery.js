@@ -2,17 +2,14 @@ const express = require("express");
 const { pool } = require("../database");
 const { check, validationResult } = require("express-validator");
 const xlReader = require("xlsx");
-const xlParser = require('../xlParser');
-const http = require('http')
-const fetch = require('node-fetch')
+const xlParser = require("../xlParser");
+const http = require("http");
+const fetch = require("node-fetch");
 const router = express.Router();
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
-
-
-
 
   router.post(
     "/addExam",
@@ -45,12 +42,11 @@ pool.getConnection((err, connection) => {
         } else {
           console.log(`Inserted data in exams ${result}`);
           fetch(`http://localhost:4000/API/query/getExams/${result.insertId}`)
-          .then(res=>res.json())
-          .then(json=>{
-            console.log(json)
-            res.status(200).json({'exams':json});
-          });
-          
+            .then(res => res.json())
+            .then(json => {
+              console.log(json);
+              res.status(200).json({ exams: json });
+            });
         }
       });
     }
@@ -73,14 +69,14 @@ pool.getConnection((err, connection) => {
       check("codeEnd")
         .exists()
         .not()
-        .isEmpty(),
+        .isEmpty()
     ],
     (req, res) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
       }
-      const status = 'Not assigned';
+      const status = "Not assigned";
       const postNewPack = `INSERT INTO package(id, packageCode, noOfCopies, codeStart, 
         codeEnd, examID, status) VALUES 
         (${null}, '${req.body.packageCode}', ${req.body.noOfCopies}, '${
@@ -91,7 +87,9 @@ pool.getConnection((err, connection) => {
         else {
           console.log(`Inserted data in packages ${result}`);
           console.log(result.insertId);
-          res.status(200).json(Object.assign(req.body, {id:result.insertId}));
+          res
+            .status(200)
+            .json(Object.assign(req.body, { id: result.insertId }));
         }
       });
     }
@@ -103,13 +101,6 @@ pool.getConnection((err, connection) => {
       check("name")
         .exists()
         .not()
-        .isEmpty(),
-      check("contact")
-        .exists()
-        .isLength({ min: 10, max: 10 }),
-      check("address")
-        .exists()
-        .not()
         .isEmpty()
     ],
     (req, res) => {
@@ -118,13 +109,40 @@ pool.getConnection((err, connection) => {
         return res.status(422).json({ errors: errors.array() });
       }
 
-      const newPerson = `INSERT INTO person(id, name, contact, address) VALUES 
-    (${null}, '${req.body.name}', ${req.body.contact}, '${req.body.address}')`;
+      const newPerson = `INSERT INTO person
+      (id, name, contact, courseCode,
+        programme,
+        year_part,
+        subject,
+        campus,
+        teachingExperience,
+        experienceinthisSubj,
+        academicQualification,
+        jobType,
+        email) 
+      VALUES 
+        (${null}, 
+        '${req.body.name}', 
+        '${req.body.contact}', 
+        '${req.body.courseCode}',
+        '${req.body.programme}',
+        '${req.body.year_part}',
+        '${req.body.subject}',
+        '${req.body.campus}',
+        '${req.body.teachingExperience}',
+        '${req.body.experienceinthisSubj}',
+        '${req.body.academicQualification}',
+        '${req.body.jobType}',
+        '${req.body.email}'
+        
+        )`;
       connection.query(newPerson, (err, result) => {
         if (err) throw err;
         else {
           console.log(`Inserted data in person ${result}`);
-          res.status(200).json(Object.assign(req.body, {id:result.insertId}));
+          res
+            .status(200)
+            .json(Object.assign(req.body, { id: result.insertId }));
         }
       });
     }
@@ -157,7 +175,7 @@ pool.getConnection((err, connection) => {
       if (err) throw err;
       else {
         console.log(`Inserted data in assignment ${result}`);
-        res.status(200).json(Object.assign(req.body, {id:result.insertId}));
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));
       }
     });
   });

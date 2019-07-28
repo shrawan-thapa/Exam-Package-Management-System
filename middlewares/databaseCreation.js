@@ -33,7 +33,7 @@ createDB = function(req, res, next){
       courseCode VARCHAR(255),
       year ENUM('I', 'II','III','IV'),
       subjectName VARCHAR(255),
-      part ENUM('I', 'I'),
+      part ENUM('I', 'II'),
       programID INT,
       Foreign KEY (programID) references program(id)
      )`;
