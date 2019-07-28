@@ -22,7 +22,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.put("/editPerson", (req, res) => {
+  router.put("/editPerson/:id", (req, res) => {
     const editPersonQuery = `UPDATE person
     SET name="${req.body.name}",
     contact="${req.body.contact}",
@@ -35,7 +35,8 @@ pool.getConnection((err, connection) => {
     experienceinthisSubj="${req.body.experienceinthisSubj}",
     academicQualification="${req.body.academicQualification}",
     jobType="${req.body.jobType}",
-    email="${req.body.email}",
+    email="${req.body.email}"
+    WHERE ID = ${req.params.id}
     
     `;
     connection.query(editPersonQuery, (err, result) => {
