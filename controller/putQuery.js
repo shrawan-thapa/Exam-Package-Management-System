@@ -11,7 +11,7 @@ pool.getConnection((err, connection) => {
     const updateSubmission = `UPDATE assignment JOIN package ON assignment.packageID=package.id
     SET assignment.dateOfSubmission="${req.body.dateOfSubmission}", 
     package.status="Submitted"
-    WHERE assignment.id="${req.body.id}"`;
+    WHERE package.id="${req.body.id}"`;
 
     connection.query(updateSubmission, (err, result) => {
       if (err) throw err;

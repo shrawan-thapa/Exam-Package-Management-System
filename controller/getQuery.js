@@ -8,10 +8,10 @@ pool.getConnection((err, connection) => {
   console.log("Database Connected");
 
   router.get("/getPendingPackages", (req, res) => {
-    const pendingPackagequery = `SELECT id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofSubmission as tobeSubmitted
+    const pendingPackagequery = `SELECT id, packageCode, status, dateofAssignment as assignedDate, name as assignedTo, contact, dateofSubmission as tobeSubmitted
           FROM person JOIN 
           (
-              SELECT dateofAssignment, dateofSubmission, packageCode, personID FROM
+              SELECT dateofAssignment, dateofSubmission, packageCode, personID, status FROM
               assignment JOIN package
               ON packageID = package.id
               WHERE status="Pending"
