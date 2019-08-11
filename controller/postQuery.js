@@ -154,8 +154,7 @@ pool.getConnection((err, connection) => {
       return [
         null,
         req.body.dateOfAssignment,
-        req.body.dateOfSubmission,
-        req.body.noOfPackets,
+        req.body.dateOfDeadline,
         element,
         req.body.personID
       ];
@@ -165,7 +164,7 @@ pool.getConnection((err, connection) => {
     // VALUES (${null}, '${req.body.dateOfAssignment}', '${
     //   req.body.dateOfSubmission
     // }', ${req.body.noOfPackets}, ${req.body.packageID}, ${req.body.personID})`;
-    const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID) 
+    const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfDeadline, packageID, personID) 
     VALUES ?;
     UPDATE package
     SET status = 'Pending'

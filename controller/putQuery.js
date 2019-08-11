@@ -7,7 +7,7 @@ const router = express.Router();
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
-  router.put("/updateSubmission", (req, res) => {
+  router.put("/receivePackage", (req, res) => {
     const updateSubmission = `UPDATE assignment JOIN package ON assignment.packageID=package.id
     SET assignment.dateOfSubmission="${req.body.dateOfSubmission}", 
     package.status="Submitted"
@@ -17,6 +17,7 @@ pool.getConnection((err, connection) => {
       if (err) throw err;
       else {
         console.log("Submission Completed!!");
+        console.log(result);
         res.status(200).send(result);
       }
     });
