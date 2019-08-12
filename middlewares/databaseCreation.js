@@ -98,6 +98,7 @@ createDB = function(req, res, next){
     connection.query(queryCreateAss, (err, result) => {
       if (err) throw err;
       console.log("Table assignment created");
+      
     });
   
     connection.release();
