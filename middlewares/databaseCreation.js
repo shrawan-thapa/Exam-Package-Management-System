@@ -31,9 +31,9 @@ createDB = function(req, res, next){
     const queryCreateSubject = `CREATE TABLE IF NOT EXISTS subject
     (id INT AUTO_INCREMENT PRIMARY KEY,
       courseCode VARCHAR(255),
-      year ENUM('First', 'Second','Third','Fourth'),
+      year ENUM('I', 'II','III','IV'),
       subjectName VARCHAR(255),
-      part ENUM('First', 'Second'),
+      part ENUM('I', 'II'),
       programID INT,
       Foreign KEY (programID) references program(id)
      )`;
@@ -98,6 +98,7 @@ createDB = function(req, res, next){
     connection.query(queryCreateAss, (err, result) => {
       if (err) throw err;
       console.log("Table assignment created");
+      
     });
   
     connection.release();
