@@ -46,7 +46,7 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getExams", (req, res) => {
-    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
+    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode,subject.id as subjectID, year, part, programName 
           FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id`;
 
     connection.query(examGetterQuery, (err, result) => {
@@ -58,7 +58,7 @@ pool.getConnection((err, connection) => {
     });
   });
   router.get("/getExams/:id", (req, res) => {
-    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
+    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, academicDegree,year, part, programName, program.id as programID, subject.id as subjectID
           FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id WHERE exam.id = '${
             req.params.id
           }'`;
