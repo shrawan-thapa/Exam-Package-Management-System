@@ -11,7 +11,7 @@ pool.getConnection((err, connection) => {
     const updateSubmission = `UPDATE assignment JOIN package ON assignment.packageID=package.id
     SET assignment.dateOfSubmission="${req.body.dateOfSubmission}", 
     package.status="Submitted"
-    WHERE assignment.id="${req.body.id}"`;
+    WHERE package.id="${req.body.id}"`;
 
     connection.query(updateSubmission, (err, result) => {
       if (err) throw err;
@@ -48,6 +48,45 @@ pool.getConnection((err, connection) => {
       }
     });
   });
+
+  router.put("/editExam/:id", (req, res) => {
+    const editExamQuery = `UPDATE exam
+    SET subjectID ="${req.body.subjectID}",
+    date ="${req.body.date}",
+    examType ="${req.body.examType}"
+    WHERE id="${req.params.id}"
+   
+    `;
+    connection.query(editExamQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Updated exam");
+        res.status(200).send(req.body);
+      }
+    });
+  });
+
+  router.put("/editPackage/:id", (req, res) => {
+    const editPackageQuery = `UPDATE package
+    SET packageCode ="${req.body.packageCode}",
+    noOfCopies ="${req.body.noOfCopies}",
+    codeStart ="${req.body.codeStart}"
+    codeEnd ="${req.body.codeEnd}"
+    examID ="${req.body.examID}"
+    status ="${req.body.status}"
+    WHERE id="${req.params.id}"
+   
+    `;
+    connection.query(editPackageQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Updated package");
+        res.status(200).send(req.body);
+      }
+    });
+  });
+
+
 
   connection.release();
 });

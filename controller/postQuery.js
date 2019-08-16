@@ -160,6 +160,7 @@ pool.getConnection((err, connection) => {
       ];
     });
     console.log(insertList);
+    
     // const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID)
     // VALUES (${null}, '${req.body.dateOfAssignment}', '${
     //   req.body.dateOfSubmission
