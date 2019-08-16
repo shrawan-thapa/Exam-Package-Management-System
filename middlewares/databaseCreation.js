@@ -19,6 +19,7 @@ createDB = function(req, res, next){
     const queryCreateProgram = `CREATE TABLE IF NOT EXISTS program
     (id INT AUTO_INCREMENT PRIMARY KEY,
      programName VARCHAR(255),
+     academicDegree VARCHAR(255),
      departmentID INT,
      Foreign KEY (departmentID) references department(id)
      )`;
@@ -27,10 +28,11 @@ createDB = function(req, res, next){
       console.log("Table program created");
     });
   
-    const queryCreateSyllabus = `CREATE TABLE IF NOT EXISTS syllabus
+    const queryCreateSyllabus = `CREATE TABLE IF NOT EXISTS subject
     (id INT AUTO_INCREMENT PRIMARY KEY,
-      subjectCode VARCHAR(255),
+      courseCode VARCHAR(255),
       year ENUM('First', 'Second','Third','Fourth'),
+      subjectName VARCHAR(255),
       part ENUM('First', 'Second'),
       programID INT,
       Foreign KEY (programID) references program(id)
@@ -42,10 +44,10 @@ createDB = function(req, res, next){
   
     const queryCreateExam = `CREATE TABLE IF NOT EXISTS exam
      (id INT AUTO_INCREMENT PRIMARY KEY,
-      syllabusID INT, 
+      subjectID INT, 
       examType VARCHAR(255), 
       date VARCHAR(12),
-      Foreign KEY (syllabusID) references syllabus(id))`;
+      Foreign KEY (syllabusID) references subject(id))`;
     connection.query(queryCreateExam, (err, result) => {
       if (err) throw err;
       console.log("Table exam created");
