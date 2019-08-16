@@ -100,6 +100,15 @@ createDB = function(req, res, next){
       console.log("Table assignment created");
       
     });
+
+    const queryCreateUser = `CREATE TABLE IF NOT EXISTS user
+    (user VARCHAR(255) PRIMARY KEY,
+    password VARCHAR(255))`;
+
+    connection.query(queryCreateUser, (err, result) =>{
+      if(err) throw err;
+      console.log("User TAble created");
+    });
   
     connection.release();
   });

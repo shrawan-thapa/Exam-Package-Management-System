@@ -7,6 +7,7 @@ const router = express.Router();
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
+
   router.put("/receivePackage", (req, res) => {
     const updateSubmission = `UPDATE assignment JOIN package ON assignment.packageID=package.id
     SET assignment.dateOfSubmission="${req.body.dateOfSubmission}", 
@@ -18,7 +19,7 @@ pool.getConnection((err, connection) => {
       else {
         console.log("Submission Completed!!");
         console.log(result);
-        res.status(200).send(result);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
       }
     });
   });
@@ -44,7 +45,7 @@ pool.getConnection((err, connection) => {
       if (err) throw err;
       else {
         console.log("Updated person");
-        res.status(200).send(req.body);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
       }
     });
   });
@@ -81,7 +82,25 @@ pool.getConnection((err, connection) => {
       if (err) throw err;
       else {
         console.log("Updated package");
-        res.status(200).send(req.body);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
+      }
+    });
+  });
+
+  router.put("/editAssignment/:id", (req, res) =>{
+    const editAssignmentCode = ` UPDATE assignment
+      SET dateOfAssignment = "${req.body.dateOfAssignment}",
+      dateOfSubmission = "${req.body.dateOfSubmission}",
+      noOfPackets = "${req.body.noOfPackets}",
+      packageID = "${req.body.packageID}",
+      personID = "${req.body.personID}"
+      WHERE id = "${req.params.id}"
+    `;
+    connection.query(editAssignmentCode, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Updated Assignment");
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
       }
     });
   });

@@ -5,6 +5,10 @@ const xlReader = require("xlsx");
 const xlParser = require("../xlParser");
 const http = require("http");
 const fetch = require("node-fetch");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const auth = require('../middlewares/auth');
+const config = require('config');
 const router = express.Router();
 
 pool.getConnection((err, connection) => {
@@ -25,7 +29,7 @@ pool.getConnection((err, connection) => {
         .exists()
         .not()
         .isEmpty()
-    ],
+    ], auth, 
     (req, res) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -35,7 +39,7 @@ pool.getConnection((err, connection) => {
       const postExams = `INSERT INTO exam (id, subjectID, examType, date) VALUES (${null}, ${
         req.body.subjectID
       }, '${req.body.examType}','${req.body.date}')`;
-      connection.query(postExams, (err, result) => {
+      connection.query(postExams,auth,  (err, result) => {
         if (err) {
           console.log("Database Error");
           throw err;
@@ -70,7 +74,7 @@ pool.getConnection((err, connection) => {
         .exists()
         .not()
         .isEmpty()
-    ],
+    ], auth, 
     (req, res) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -102,7 +106,7 @@ pool.getConnection((err, connection) => {
         .exists()
         .not()
         .isEmpty()
-    ],
+    ], auth, 
     (req, res) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -148,7 +152,37 @@ pool.getConnection((err, connection) => {
     }
   );
 
-  router.post("/addAssignment", (req, res) => {
+  router.post("/addUser", async (req, res) => {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const addUserQuery = `INSERT INTO user (user, password) VALUES ('${req.body.username}', '${hashedPassword}')`;
+    connection.query(addUserQuery, (err, result)=>{
+      if(err) throw err;
+      else{
+        res.status(200).send("Successful Creation");
+      }
+    });
+  });
+
+  router.post("/login", async (req, res) => {
+    const getUser = `SELECT * from user where user = "${req.body.username}"`;
+    connection.query(getUser, async(err, result) => {
+      if (err) throw err;
+      else {
+        const obj = result[0];
+        const validPassword = await bcrypt.compare(req.body.password, obj.password);
+        console.log(validPassword);
+        if(validPassword){
+          const token = jwt.sign({username:obj.user, password:obj.password},config.get('jwtPrivateKey'));
+          res.header('x-auth-token', token).status(200).send(token);
+        }else{
+          res.status(404).send("No User with given information");
+        }
+      }
+    });
+  });
+
+  router.post("/addAssignment",auth,  (req, res) => {
     const packageIDs = req.body.packages;
     insertList = packageIDs.map(element => {
       return [

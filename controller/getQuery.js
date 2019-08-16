@@ -1,13 +1,13 @@
 const express = require("express");
 const { pool } = require("../database");
-
+const auth = require('../middlewares/auth');
 const router = express.Router();
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
 
-  router.get("/getPendingPackages", (req, res) => {
+  router.get("/getPendingPackages",auth,  (req, res) => {
     const pendingPackagequery = `SELECT assignmentID as id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted
           FROM person JOIN 
           (
@@ -27,7 +27,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getAssignments", (req, res) => {
+  router.get("/getAssignments", auth,  (req, res) => {
     const assignedQuery = `SELECT person.id, name, contact, address, packageCode, noOfPackets, dateOfAssignment, status
           FROM person JOIN
           (
@@ -45,7 +45,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getExams", (req, res) => {
+  router.get("/getExams", auth,  (req, res) => {
     const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
           FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id`;
 
@@ -57,7 +57,7 @@ pool.getConnection((err, connection) => {
       }
     });
   });
-  router.get("/getExams/:id", (req, res) => {
+  router.get("/getExams/:id", auth,  (req, res) => {
     const examGetterQuery = `SELECT subjectID, exam.id, exam.date, exam.examType, courseCode, year, part, programName 
           FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id WHERE exam.id = '${
             req.params.id
@@ -72,7 +72,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getPerson", (req, res) => {
+  router.get("/getPerson", auth,  (req, res) => {
     const getAllPerson = `SELECT * FROM person`;
     connection.query(getAllPerson, (err, result) => {
       if (err) throw err;
@@ -82,7 +82,7 @@ pool.getConnection((err, connection) => {
       }
     });
   });
-  router.get("/getPackages", (req, res) => {
+  router.get("/getPackages", auth,  (req, res) => {
     const getAllPerson = `SELECT * FROM package`;
     connection.query(getAllPerson, (err, result) => {
       if (err) throw err;
@@ -93,13 +93,13 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getNotAssignedPackages", (req, res) => {
+  router.get("/getNotAssignedPackages", auth,  (req, res) => {
     const getPack = `SELECT p.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName,status FROM package as p JOIN exam as
      e on p.examID = e.id JOIN subject as s ON
      e.subjectID = s.id JOIN program as pr on pr.id = s.programID
      WHERE status="Not Assigned"`;
 
-    connection.query(getPack, (err, result) => {
+    connection.query(getPack, auth,  (err, result) => {
       if (err) throw err;
       else {
         console.log("All Pack returned!!");
@@ -108,7 +108,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getAllPackages", (req, res) => {
+  router.get("/getAllPackages", auth, (req, res) => {
     const getPack = `SELECT p.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName,status FROM package as p JOIN exam as
      e on p.examID = e.id JOIN subject as s ON
      e.subjectID = s.id JOIN program as pr on pr.id = s.programID`;
@@ -123,7 +123,7 @@ pool.getConnection((err, connection) => {
   }); 
 
 
-  router.get("/getOnePerson/:id", (req, res) => {
+  router.get("/getOnePerson/:id", auth, (req, res) => {
     const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id} `;
     connection.query(getOnePerson, (err, result) => {
       if (err) throw err;
@@ -134,7 +134,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getOneAssignment/:id", (req, res) => {
+  router.get("/getOneAssignment/:id",auth,  (req, res) => {
     const getOnePerson = `SELECT packageCode, campus, contact,dateOfSubmission, dateOfAssignment,name,dateofDeadline as dateOfDeadline from assignment JOIN person JOIN package where personID = person.id and packageID = package.id and assignment.id =${req.params.id}; `;
     connection.query(getOnePerson, (err, result) => {
       if (err) throw err;
@@ -145,7 +145,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getSubjectPackage/:scode", (req, res) => {
+  router.get("/getSubjectPackage/:scode",auth,  (req, res) => {
     const getSubjectPackage = `SELECT packageCode FROM package JOIN
     (
         SELECT exam.id FROM 
@@ -164,7 +164,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getSubjectList", (req, res) => {
+  router.get("/getSubjectList",auth,  (req, res) => {
     const getAllPerson = `SELECT subject.id,subjectName,courseCode, year, part, programName FROM subject JOIN program
     ON programID=program.id`;
     connection.query(getAllPerson, (err, result) => {
@@ -176,7 +176,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getDepartmentList", (req, res) => {
+  router.get("/getDepartmentList",auth,  (req, res) => {
     const getAllPerson = `SELECT * FROM department`;
     connection.query(getAllPerson, (err, result) => {
       if (err) throw err;
@@ -186,7 +186,8 @@ pool.getConnection((err, connection) => {
       }
     });
   });
-  router.get("/getProgramList", (req, res) => {
+
+  router.get("/getProgramList",auth,  (req, res) => {
     const getAllPerson = `SELECT * FROM program`;
     connection.query(getAllPerson, (err, result) => {
       if (err) throw err;
@@ -196,6 +197,8 @@ pool.getConnection((err, connection) => {
       }
     });
   });
+
+ 
 
   connection.release();
 });

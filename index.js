@@ -1,9 +1,14 @@
 const express = require("express");
-const config = require("config");
 const routes = require("./routes");
 const bodyParser = require("body-parser");
+const config = require('config');
 const app = express();
 
+
+if(!config.get('jwtPrivateKey')){
+  console.log("FATAL ERROR:jwtPrivateKey is not defined");
+  process.exit(1);
+}
 //Middlewares
 //Allow CORS
 app.use(function(req, res, next) {
