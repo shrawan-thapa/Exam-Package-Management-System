@@ -46,7 +46,7 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getExams", (req, res) => {
-    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
+    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName, subjectID 
           FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id`;
 
     connection.query(examGetterQuery, (err, result) => {
@@ -57,6 +57,7 @@ pool.getConnection((err, connection) => {
       }
     });
   });
+
   router.get("/getExams/:id", (req, res) => {
     const examGetterQuery = `SELECT subjectID, exam.id, exam.date, exam.examType, courseCode, year, part, programName 
           FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id WHERE exam.id = '${
@@ -110,8 +111,7 @@ pool.getConnection((err, connection) => {
         res.status(200).send(JSON.parse(JSON.stringify(result)));
       }
     });
-  }); 
-
+  });
 
   router.get("/getOnePerson/:id", (req, res) => {
     const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id} `;
@@ -125,7 +125,9 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getOneAssignment/:id", (req, res) => {
-    const getOnePerson = `SELECT packageCode, campus, contact,dateOfSubmission, dateOfAssignment,name,dateofDeadline as dateOfDeadline from assignment JOIN person JOIN package where personID = person.id and packageID = package.id and assignment.id =${req.params.id}; `;
+    const getOnePerson = `SELECT packageCode, campus, contact,dateOfSubmission, dateOfAssignment,name,dateofDeadline as dateOfDeadline from assignment JOIN person JOIN package where personID = person.id and packageID = package.id and assignment.id =${
+      req.params.id
+    }; `;
     connection.query(getOnePerson, (err, result) => {
       if (err) throw err;
       else {
@@ -144,6 +146,49 @@ pool.getConnection((err, connection) => {
         WHERE subjectCode="${req.params.scode}"
     ) as t 
     ON examID=t.id`;
+
+    connection.query(getSubjectPackage, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Succeded");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
+  router.get("/getPendingExamPackages/:year/:part", (req, res) => {
+    const getSubjectPackage = `SELECT id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted
+    FROM person JOIN 
+    (
+        SELECT packageCode, dateOfAssignment, dateOfDeadline, personID FROM
+        assignment JOIN package
+        ON packageID = package.id
+        JOIN exam
+        ON examID = exam.id
+        JOIN subject
+        ON subjectID = subject.id
+        WHERE status="Pending" AND part="${req.params.part}" AND date LIKE "${
+      req.params.year
+    }%"
+    ) AS assn
+    ON person.id = assn.personID`;
+
+    connection.query(getSubjectPackage, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Succeded");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
+  router.get("/getNotAssignedExamPackages/:year/:part", (req, res) => {
+    const getSubjectPackage = `SELECT package.id,packageCode, noOfCopies,codeStart,codeEnd FROM package
+    JOIN exam ON examID = exam.id
+    JOIN subject ON subjectID = subject.id
+    WHERE status="Not Assigned" and part="${req.params.part}" AND date LIKE "${
+      req.params.year
+    }%"`;
 
     connection.query(getSubjectPackage, (err, result) => {
       if (err) throw err;
