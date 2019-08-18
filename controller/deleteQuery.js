@@ -1,6 +1,7 @@
 const express = require("express");
 const { pool } = require("../database");
 const { check, validationResult } = require("express-validator");
+const auth = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
 
-  router.delete("/deleteExam/:id", (req, res)=>{
+  router.delete("/deleteExam/:id",auth, (req, res)=>{
     const deleteExamQuery = `DELETE FROM exam WHERE id = ${req.params.id}`;
     connection.query(deleteExamQuery, (err, result) => {
       if (err) throw err;
@@ -21,7 +22,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.delete("/deletePackage/:id", (req, res)=>{
+  router.delete("/deletePackage/:id",auth, (req, res)=>{
     const deletePackageQuery = `DELETE FROM package WHERE id = ${req.params.id}`;
     connection.query(deletePackageQuery, (err, result) => {
       if (err) throw err;
@@ -34,7 +35,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.delete("/deletePerson/:id", (req, res)=>{
+  router.delete("/deletePerson/:id",auth, (req, res)=>{
     const deletePersonQuery = `DELETE FROM package WHERE id = ${req.params.id}`;
     connection.query(deletePersonQuery, (err, result) => {
       if (err) throw err;
@@ -49,7 +50,7 @@ pool.getConnection((err, connection) => {
 
 
   
-  router.delete("/deleteAssignment/:id", (req, res)=>{
+  router.delete("/deleteAssignment/:id",auth, (req, res)=>{
     const deletePersonQuery = `DELETE FROM package WHERE id = ${req.params.id}`;
     connection.query(deletePersonQuery, (err, result) => {
       if (err) throw err;

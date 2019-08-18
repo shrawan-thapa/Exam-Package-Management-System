@@ -173,7 +173,7 @@ pool.getConnection((err, connection) => {
         const validPassword = await bcrypt.compare(req.body.password, obj.password);
         console.log(validPassword);
         if(validPassword){
-          const token = jwt.sign({username:obj.user, password:obj.password},config.get('jwtPrivateKey'));
+          const token = jwt.sign({username:obj.user },config.get('jwtPrivateKey'));
           res.header('x-auth-token', token).status(200).send(token);
         }else{
           res.status(404).send("No User with given information");
