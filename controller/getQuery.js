@@ -137,6 +137,19 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.get("/getPackage/:id", (req, res) => {
+    const getOnePerson = `SELECT packageCode, noOfCopies, codeStart,codeEnd, academicDegree, programName, year, part, subjectName, examID  
+    FROM package JOIN exam JOIN subject JOIN program
+    WHERE package.id =${req.params.id}; `;
+    connection.query(getOnePerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("One Assignment returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
   router.get("/getSubjectPackage/:scode", (req, res) => {
     const getSubjectPackage = `SELECT packageCode FROM package JOIN
     (
@@ -156,7 +169,7 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getPendingExamPackages/:year/:part", (req, res) => {
+  router.get("/getPendingExamPackages/:year/:part/:type", (req, res) => {
     const getSubjectPackage = `SELECT id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted
     FROM person JOIN 
     (
@@ -169,7 +182,7 @@ pool.getConnection((err, connection) => {
         ON subjectID = subject.id
         WHERE status="Pending" AND part="${req.params.part}" AND date LIKE "${
       req.params.year
-    }%"
+    }%"  AND examType="${req.params.type}"
     ) AS assn
     ON person.id = assn.personID`;
 
@@ -182,13 +195,14 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getNotAssignedExamPackages/:year/:part", (req, res) => {
+  router.get("/getNotAssignedExamPackages/:year/:part/:type", (req, res) => {
+    console.log(req.params.type);
     const getSubjectPackage = `SELECT package.id,packageCode, noOfCopies,codeStart,codeEnd FROM package
     JOIN exam ON examID = exam.id
     JOIN subject ON subjectID = subject.id
     WHERE status="Not Assigned" and part="${req.params.part}" AND date LIKE "${
       req.params.year
-    }%"`;
+    }%" AND examType="${req.params.type}"`;
 
     connection.query(getSubjectPackage, (err, result) => {
       if (err) throw err;

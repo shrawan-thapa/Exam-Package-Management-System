@@ -46,7 +46,7 @@ createDB = function(req, res, next){
      (id INT AUTO_INCREMENT PRIMARY KEY,
       subjectID INT, 
       examType ENUM('Regular', 'Back'), 
-      date VARCHAR(12),
+      date VARCHAR(10),
       Foreign KEY (subjectID) references subject(id))`;
     connection.query(queryCreateExam, (err, result) => {
       if (err) throw err;
@@ -88,9 +88,9 @@ createDB = function(req, res, next){
   
     const queryCreateAss = `CREATE TABLE IF NOT EXISTS assignment
      (id INT AUTO_INCREMENT PRIMARY KEY, 
-     dateOfAssignment VARCHAR(12), 
-     dateOfSubmission VARCHAR(12),
-     dateOfDeadline VARCHAR(12), 
+     dateOfAssignment VARCHAR(10), 
+     dateOfSubmission VARCHAR(10),
+     dateOfDeadline VARCHAR(10), 
      packageID INT,
      personID INT,
      Foreign KEY (personID) references person(id),
