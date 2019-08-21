@@ -138,8 +138,13 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getPackage/:id", (req, res) => {
-    const getOnePerson = `SELECT packageCode, noOfCopies, codeStart,codeEnd, academicDegree, programName, year, part, subjectName, examID  
-    FROM package JOIN exam JOIN subject JOIN program
+    const getOnePerson = `SELECT packageCode, noOfCopies, codeStart,codeEnd, academicDegree, programName, year, part, subjectID, examID  
+    FROM package JOIN exam
+    ON examID = exam.id 
+    JOIN subject
+    ON subjectID = subject.id 
+    JOIN program
+    ON programID = program.id
     WHERE package.id =${req.params.id}; `;
     connection.query(getOnePerson, (err, result) => {
       if (err) throw err;
