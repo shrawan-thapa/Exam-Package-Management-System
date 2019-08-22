@@ -100,6 +100,35 @@ createDB = function(req, res, next){
       console.log("Table assignment created");
       
     });
+
+    const pendingView = `CREATE VIEW IF NOT EXISTS pending_packages AS 
+                        SELECT package.id, status, subjectID FROM 
+                        package JOIN exam ON examID=exam.id 
+                        WHERE status="Pending"`;
+    
+    connection.query(pendingView,(err,result)=>{
+      if(err) throw err;
+      else{
+        console.log("Pending Packages View Created!!")
+      }
+    }); 
+
+    const deptPackView = `CREATE VIEW IF NOT EXISTS department_packages AS
+    SELECT departmentName, year, status FROM 
+    department 
+    JOIN program 
+    ON department.id=departmentID
+    JOIN subject 
+    ON program.id= programID
+    JOIN pending_packages 
+    ON subject.id=pending_packages.subjectID
+    `;
+    connection.query(deptPackView,(err,result)=>{
+      if(err) throw err;
+      else{
+        console.log("Department Packages View Created!!")
+      }
+    }); 
   
     connection.release();
   });

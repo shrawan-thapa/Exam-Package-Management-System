@@ -251,6 +251,32 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.get("/getDepartmentWiseGraph", (req,res)=>{
+    const getGraph = `SELECT departmentName, year, COUNT(status) as noOfPendingPackages 
+    FROM department_packages GROUP by departmentName,year`;
+
+    connection.query(getGraph, (err, result)=>{
+      if(err) throw err;
+      else{
+        console.log("Okay now draw the graph!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    }
+    );
+  });
+
+  router.get("/getYearWiseGraph", (req,res)=>{
+    const getYearGraph = `SELECT year, COUNT(status) as noOfPendingPackages
+                          FROM department_packages
+                          GROUP BY year`;
+    connection.query(getYearGraph, (err, result)=>{
+      if(err) throw err;
+      else{
+        console.log("Okay now draw the graph!!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
   connection.release();
 });
 module.exports = router;
