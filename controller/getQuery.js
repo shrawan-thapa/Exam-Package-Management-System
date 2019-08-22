@@ -100,7 +100,7 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getAllPackages", (req, res) => {
-    const getPack = `SELECT p.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName,status FROM package as p JOIN exam as
+    const getPack = `SELECT p.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName,year,part,subjectName,status FROM package as p JOIN exam as
      e on p.examID = e.id JOIN subject as s ON
      e.subjectID = s.id JOIN program as pr on pr.id = s.programID`;
 
@@ -137,6 +137,24 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.get("/getPackage/:id", (req, res) => {
+    const getOnePerson = `SELECT packageCode, noOfCopies, codeStart,codeEnd, academicDegree, programName, year, part, subjectID, examID  
+    FROM package JOIN exam
+    ON examID = exam.id 
+    JOIN subject
+    ON subjectID = subject.id 
+    JOIN program
+    ON programID = program.id
+    WHERE package.id =${req.params.id}; `;
+    connection.query(getOnePerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("One Assignment returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
   router.get("/getSubjectPackage/:scode", (req, res) => {
     const getSubjectPackage = `SELECT packageCode FROM package JOIN
     (
@@ -156,11 +174,11 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getPendingExamPackages/:year/:part", (req, res) => {
-    const getSubjectPackage = `SELECT id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted,year
+  router.get("/getPendingExamPackages/:year/:part/:type", (req, res) => {
+    const getSubjectPackage = `SELECT assignmentID as id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted
     FROM person JOIN 
     (
-        SELECT packageCode, dateOfAssignment, dateOfDeadline, personID,subject.year, subject.part FROM
+        SELECT assignment.id as assignmentID,packageCode, dateOfAssignment, dateOfDeadline, personID,subject.year, subject.part FROM
         assignment JOIN package
         ON packageID = package.id
         JOIN exam
@@ -169,7 +187,7 @@ pool.getConnection((err, connection) => {
         ON subjectID = subject.id
         WHERE status="Pending" AND part="${req.params.part}" AND date LIKE "${
       req.params.year
-    }%"
+    }%"  AND examType="${req.params.type}"
     ) AS assn
     ON person.id = assn.personID`;
 
@@ -182,14 +200,15 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getNotAssignedExamPackages/:year/:part", (req, res) => {
-    const getSubjectPackage = `SELECT package.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName FROM package
+  router.get("/getNotAssignedExamPackages/:year/:part/:type", (req, res) => {
+    console.log(req.params.type);
+    const getSubjectPackage = `SELECT package.id,packageCode, noOfCopies,codeStart,codeEnd FROM package
     JOIN exam ON examID = exam.id
     JOIN subject ON subjectID = subject.id
     JOIN program as pr on pr.id = subject.programID
     WHERE status="Not Assigned" and part="${req.params.part}" AND date LIKE "${
       req.params.year
-    }%"`;
+    }%" AND examType="${req.params.type}"`;
 
     connection.query(getSubjectPackage, (err, result) => {
       if (err) throw err;

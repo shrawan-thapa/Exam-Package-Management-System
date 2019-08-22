@@ -19,8 +19,7 @@ pool.getConnection((err, connection) => {
         .not()
         .isEmpty(),
       check("examType")
-        .exists()
-        .isIn("Regular", "Back"),
+        .exists(),
       check("date")
         .exists()
         .not()
@@ -29,6 +28,7 @@ pool.getConnection((err, connection) => {
     (req, res) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log(errors.array());
         return res.status(422).json({ errors: errors.array() });
       }
 
@@ -160,7 +160,7 @@ pool.getConnection((err, connection) => {
       ];
     });
     console.log(insertList);
-    
+
     // const assignQ = `INSERT INTO assignment(id, dateOfAssignment, dateOfSubmission, noOfPackets, packageID, personID)
     // VALUES (${null}, '${req.body.dateOfAssignment}', '${
     //   req.body.dateOfSubmission

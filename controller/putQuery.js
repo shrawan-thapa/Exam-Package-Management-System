@@ -70,10 +70,9 @@ pool.getConnection((err, connection) => {
     const editPackageQuery = `UPDATE package
     SET packageCode ="${req.body.packageCode}",
     noOfCopies ="${req.body.noOfCopies}",
-    codeStart ="${req.body.codeStart}"
-    codeEnd ="${req.body.codeEnd}"
+    codeStart ="${req.body.codeStart}",
+    codeEnd ="${req.body.codeEnd}",
     examID ="${req.body.examID}"
-    status ="${req.body.status}"
     WHERE id="${req.params.id}"
    
     `;
