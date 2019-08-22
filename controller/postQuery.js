@@ -10,6 +10,10 @@ const jwt = require('jsonwebtoken');
 const auth = require('../middlewares/auth');
 const config = require('config');
 const router = express.Router();
+const axios = require('axios');
+const FormData = require('form-data');
+const qs = require('qs');
+var multiparty = require('multiparty');
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
@@ -182,6 +186,33 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.post("/getSemSubject", (req, res)=>{
+      data = {
+        'prog':req.body.prog,
+        'year':req.body.year,
+        'part':req.body.part
+    }
+    console.log(data);
+    
+   axios({
+      method: 'post',
+      url: 'http://pcampus.edu.np/api/subjects/',
+      data:qs.stringify(data),
+      config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
+      })
+.then((resp) => {
+  console.log(`statusCode: ${resp.statusCode}`)
+  console.log(resp.data)
+  res.status(200).send(resp.data);
+})
+.catch((error) => {
+  console.error(error)
+  res.send(error)
+});
+    
+
+  });
+
   router.post("/addAssignment",auth,  (req, res) => {
     const packageIDs = req.body.packages;
     insertList = packageIDs.map(element => {
@@ -209,6 +240,28 @@ pool.getConnection((err, connection) => {
       if (err) throw err;
       else {
         console.log(`Inserted data in assignment ${result}`);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));
+      }
+    });
+  });
+
+  router.post("/addDepartment", (req, res) => {
+    const depQuery = `INSERT INTO department (id, departmentName) VALUES (null, '${req.body.departmentName}')`;
+    connection.query(depQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log(`Inserted data in department ${result}`);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));
+      }
+    });
+  });
+
+  router.post("/addProgram", (req, res) => {
+    const progQuery = `INSERT INTO program (id, programName, academicDegree, departmentID) VALUES (null, '${req.body.programName}', '${req.body.academicDegree}',${req.body.departmentID})`;
+    connection.query(progQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log(`Inserted data in program ${result}`);
         res.status(200).json(Object.assign(req.body, { id: result.insertId }));
       }
     });
