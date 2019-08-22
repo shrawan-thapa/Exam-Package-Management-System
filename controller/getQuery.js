@@ -157,10 +157,10 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getPendingExamPackages/:year/:part", (req, res) => {
-    const getSubjectPackage = `SELECT id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted
+    const getSubjectPackage = `SELECT id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted,year
     FROM person JOIN 
     (
-        SELECT packageCode, dateOfAssignment, dateOfDeadline, personID FROM
+        SELECT packageCode, dateOfAssignment, dateOfDeadline, personID,subject.year, subject.part FROM
         assignment JOIN package
         ON packageID = package.id
         JOIN exam
@@ -183,9 +183,10 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getNotAssignedExamPackages/:year/:part", (req, res) => {
-    const getSubjectPackage = `SELECT package.id,packageCode, noOfCopies,codeStart,codeEnd FROM package
+    const getSubjectPackage = `SELECT package.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName FROM package
     JOIN exam ON examID = exam.id
     JOIN subject ON subjectID = subject.id
+    JOIN program as pr on pr.id = subject.programID
     WHERE status="Not Assigned" and part="${req.params.part}" AND date LIKE "${
       req.params.year
     }%"`;
@@ -230,6 +231,19 @@ pool.getConnection((err, connection) => {
         res.status(200).send(JSON.parse(JSON.stringify(result)));
       }
     });
+  });
+  router.get("/getOnepackage/:packageCode", (req,res)=>{
+    console.log(req.params.packageCode)
+    const getOnePackage= `SELECT packageCode, year, part, examID,subjectName,date as examDate,person.name as assignedTo, 
+    dateOfAssignment, dateOfSubmission FROM package JOIN exam JOIN subject JOIN assignment JOIN person WHERE person.id = assignment.personID 
+    AND package.id = assignment.packageID AND examID = exam.id AND exam.subjectID =subject.id AND packageCode="${req.params.packageCode}"`;
+    connection.query(getOnePackage, (err,result)=>{
+      if(err) throw err;
+      else{
+        console.log("Package Retured");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    })
   });
 
   router.get("/getDepartmentWiseGraph", (req,res)=>{
