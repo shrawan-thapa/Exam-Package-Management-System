@@ -24,6 +24,18 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.put("/finishExam",(req, res) =>{
+    const updateExam = `UPDATE exam SET exam.examState = "Finished" where exam.id = "${req.body.id}"`;
+    connection.query(updateExam, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Exam finished!!");
+        console.log(result);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
+      }
+    });
+  });
+
   router.put("/editPerson/:id", (req, res) => {
     const editPersonQuery = `UPDATE person
     SET name="${req.body.name}",

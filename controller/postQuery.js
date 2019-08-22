@@ -40,9 +40,9 @@ pool.getConnection((err, connection) => {
         return res.status(422).json({ errors: errors.array() });
       }
 
-      const postExams = `INSERT INTO exam (id, subjectID, examType, date) VALUES (${null}, ${
+      const postExams = `INSERT INTO exam (id, subjectID, examType, date, examState) VALUES (${null}, ${
         req.body.subjectID
-      }, '${req.body.examType}','${req.body.date}')`;
+      }, '${req.body.examType}','${req.body.date}', '${req.body.examState}')`;
       connection.query(postExams,auth,  (err, result) => {
         if (err) {
           console.log("Database Error");

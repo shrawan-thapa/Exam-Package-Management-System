@@ -57,6 +57,21 @@ pool.getConnection((err, connection) => {
       }
     });
   });
+
+  router.get("/getFinishedExams", auth,  (req, res) => {
+    const examGetterQuery = `SELECT exam.id, exam.date, exam.examType, courseCode, year, part, programName 
+          FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id and examState = 'Finished'`;
+
+    connection.query(examGetterQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Exams returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
+
   router.get("/getExams/:id", auth,  (req, res) => {
     const examGetterQuery = `SELECT subjectID, exam.id, exam.date, exam.examType, courseCode, year, part, programName 
           FROM exam JOIN (subject JOIN program ON programID=program.id) ON subjectID = subject.id WHERE exam.id = '${

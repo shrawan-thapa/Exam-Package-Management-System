@@ -47,6 +47,7 @@ createDB = function(req, res, next){
       subjectID INT, 
       examType ENUM('Regular', 'Back'), 
       date VARCHAR(12),
+      examState ENUM('Running', 'Finished'),
       Foreign KEY (subjectID) references subject(id))`;
     connection.query(queryCreateExam, (err, result) => {
       if (err) throw err;
