@@ -6,6 +6,8 @@ const xlParser = require("../xlParser");
 const http = require("http");
 const fetch = require("node-fetch");
 const router = express.Router();
+const axios = require("axios");
+const qs = require("qs");
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
@@ -214,21 +216,89 @@ pool.getConnection((err, connection) => {
     }
   });
 
-  axios({
-    method: "post",
-    url: "http://pcampus.edu.np/api/subjects/",
-    data: qs.stringify(data),
-    config: { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-  })
-    .then(resp => {
-      console.log(`statusCode: ${resp.statusCode}`);
-      console.log(resp.data);
-      res.status(200).send(resp.data);
-    })
-    .catch(error => {
-      console.error(error);
-      res.send(error);
+  router.post("/initializeSubjects", async (req, res) => {
+    const departmentList = [
+      ["Department Of Civil Engineering"],
+      ["Department of Mechanical Engineering"],
+      ["Department of Electrical Engineering"],
+      ["Department of Electronics and Computer Engineering"]
+    ];
+    const programList = [
+      ["BCT", "Bachelors", 4],
+      ["BEX", "Bachelors", 4],
+      ["BCE", "Bachelors", 1],
+      ["BEL", "Bachelors", 3],
+      ["BME", "Bachelors", 2]
+    ];
+    const progs = ["BCT", "BEX", "BCE", "BEL", "BME"];
+    const years = [1, 2, 3, 4];
+    const parts = [1, 2];
+
+    // const intitalizeDepartments = `INSERT INTO department (departmentName) VALUES ?`;
+    // connection.query(intitalizeDepartments, [departmentList], (err, result) => {
+    //   if (err) {
+    //     console.log("Database Error");
+    //     throw err;
+    //   } else {
+    //     console.log(`Inserted departments`);
+    //   }
+    // });
+    // const initializePrograms = `INSERT INTO programs (programName, academicValue, departmentID) VALUES ?    `;
+    // connection.query(initializePrograms, [programList], (err, result) => {
+    //   if (err) {
+    //     console.log("Database Error");
+    //     throw err;
+    //   } else {
+    //     console.log(`Inserted departments`);
+    //   }
+    // });
+
+    progs.forEach(async prog => {
+      years.forEach(async year => {
+        parts.forEach(async part => {
+          data = {
+            prog,
+            year,
+            part
+          };
+
+          await axios({
+            method: "post",
+            url: "http://pcampus.edu.np/api/subjects/",
+            data: qs.stringify(data),
+            config: {
+              headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            }
+          })
+            .then(resp => {
+              console.log(`statusCode: ${resp.statusCode}`);
+              console.log(resp.data);
+              console.log(resp.data.length);
+              console.log(resp.data[0]);
+              //   res.status(200).send(resp.data);
+
+              const initializeSubjects = `INSERT INTO subjects (courseCode, subjectName, year, part, programID) VALUES ?    `;
+              connection.query(
+                initializeSubjects,
+                [programList],
+                (err, result) => {
+                  if (err) {
+                    console.log("Database Error");
+                    throw err;
+                  } else {
+                    console.log(`Inserted subjects`);
+                  }
+                }
+              );
+            })
+            .catch(error => {
+              console.error(error);
+              //   res.send(error);
+            });
+        });
+      });
     });
+  });
 
   connection.release();
 });
