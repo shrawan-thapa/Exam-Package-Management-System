@@ -56,7 +56,7 @@ createDB = function(req, res, next){
   
     const queryCreatePackage = `CREATE TABLE IF NOT EXISTS package
     (id INT AUTO_INCREMENT PRIMARY KEY, 
-      packageCode VARCHAR(255) UNIQUE,
+      packageCode VARCHAR(255),
      noOfCopies INT, 
      codeStart VARCHAR(255), 
      codeEnd VARCHAR(255),
