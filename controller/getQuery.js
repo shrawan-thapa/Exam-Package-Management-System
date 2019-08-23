@@ -102,7 +102,9 @@ pool.getConnection((err, connection) => {
   router.get("/getAllPackages", (req, res) => {
     const getPack = `SELECT p.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName,status FROM package as p JOIN exam as
      e on p.examID = e.id JOIN subject as s ON
-     e.subjectID = s.id JOIN program as pr on pr.id = s.programID`;
+     e.subjectID = s.id JOIN program as pr on pr.id = s.programID
+     WHERE e.isFinished != 1
+     `;
 
     connection.query(getPack, (err, result) => {
       if (err) throw err;
@@ -124,18 +126,20 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getOnepackage/:packageCode", (req,res)=>{
-    console.log(req.params.packageCode)
-    const getOnePackage= `SELECT packageCode, year, part, examID,subjectName,date as examDate,person.name as assignedTo, 
+  router.get("/getOnepackage/:packageCode", (req, res) => {
+    console.log(req.params.packageCode);
+    const getOnePackage = `SELECT packageCode, year, part, examID,subjectName,date as examDate,person.name as assignedTo, 
     dateOfAssignment, dateOfSubmission FROM package JOIN exam JOIN subject JOIN assignment JOIN person WHERE person.id = assignment.personID 
-    AND package.id = assignment.packageID AND examID = exam.id AND exam.subjectID =subject.id AND packageCode="${req.params.packageCode}"`;
-    connection.query(getOnePackage, (err,result)=>{
-      if(err) throw err;
-      else{
+    AND package.id = assignment.packageID AND examID = exam.id AND exam.subjectID =subject.id AND packageCode="${
+      req.params.packageCode
+    }"`;
+    connection.query(getOnePackage, (err, result) => {
+      if (err) throw err;
+      else {
         console.log("Package Retured");
         res.status(200).send(JSON.parse(JSON.stringify(result)));
       }
-    })
+    });
   });
 
   router.get("/getOneAssignment/:id", (req, res) => {
@@ -265,27 +269,26 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.get("/getDepartmentWiseGraph", (req,res)=>{
+  router.get("/getDepartmentWiseGraph", (req, res) => {
     const getGraph = `SELECT departmentName, year, COUNT(status) as noOfPendingPackages 
     FROM department_packages GROUP by departmentName,year`;
 
-    connection.query(getGraph, (err, result)=>{
-      if(err) throw err;
-      else{
+    connection.query(getGraph, (err, result) => {
+      if (err) throw err;
+      else {
         console.log("Okay now draw the graph!!");
         res.status(200).send(JSON.parse(JSON.stringify(result)));
       }
-    }
-    );
+    });
   });
 
-  router.get("/getYearWiseGraph", (req,res)=>{
+  router.get("/getYearWiseGraph", (req, res) => {
     const getYearGraph = `SELECT year, COUNT(status) as noOfPendingPackages
                           FROM department_packages
                           GROUP BY year`;
-    connection.query(getYearGraph, (err, result)=>{
-      if(err) throw err;
-      else{
+    connection.query(getYearGraph, (err, result) => {
+      if (err) throw err;
+      else {
         console.log("Okay now draw the graph!!!");
         res.status(200).send(JSON.parse(JSON.stringify(result)));
       }

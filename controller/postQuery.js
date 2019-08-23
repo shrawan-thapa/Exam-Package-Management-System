@@ -234,26 +234,26 @@ pool.getConnection((err, connection) => {
     const years = [1, 2, 3, 4];
     const parts = [1, 2];
 
-    // const intitalizeDepartments = `INSERT INTO department (departmentName) VALUES ?`;
-    // connection.query(intitalizeDepartments, [departmentList], (err, result) => {
-    //   if (err) {
-    //     console.log("Database Error");
-    //     throw err;
-    //   } else {
-    //     console.log(`Inserted departments`);
-    //   }
-    // });
-    // const initializePrograms = `INSERT INTO programs (programName, academicValue, departmentID) VALUES ?    `;
-    // connection.query(initializePrograms, [programList], (err, result) => {
-    //   if (err) {
-    //     console.log("Database Error");
-    //     throw err;
-    //   } else {
-    //     console.log(`Inserted departments`);
-    //   }
-    // });
+    const intitalizeDepartments = `INSERT INTO department (departmentName) VALUES ?`;
+    connection.query(intitalizeDepartments, [departmentList], (err, result) => {
+      if (err) {
+        console.log("Database Error");
+        throw err;
+      } else {
+        console.log(`Inserted departments`);
+      }
+    });
+    const initializePrograms = `INSERT INTO program (programName, academicDegree, departmentID) VALUES ?    `;
+    connection.query(initializePrograms, [programList], (err, result) => {
+      if (err) {
+        console.log("Database Error");
+        throw err;
+      } else {
+        console.log(`Inserted departments`);
+      }
+    });
 
-    progs.forEach(async prog => {
+    progs.forEach(async (prog, progIdx) => {
       years.forEach(async year => {
         parts.forEach(async part => {
           data = {
@@ -275,12 +275,19 @@ pool.getConnection((err, connection) => {
               console.log(resp.data);
               console.log(resp.data.length);
               console.log(resp.data[0]);
+              const subjectList = resp.data.map((el, index) => {
+                const mapping = { 1: "I", 2: "II", 3: "III", 4: "IV" };
+                return el
+                  .slice(0, 2)
+                  .concat([mapping[year], mapping[part], progIdx + 1]);
+              });
               //   res.status(200).send(resp.data);
+              console.log(subjectList);
 
-              const initializeSubjects = `INSERT INTO subjects (courseCode, subjectName, year, part, programID) VALUES ?    `;
+              const initializeSubjects = `INSERT INTO subject (courseCode, subjectName, year, part, programID) VALUES ?    `;
               connection.query(
                 initializeSubjects,
-                [programList],
+                [subjectList],
                 (err, result) => {
                   if (err) {
                     console.log("Database Error");

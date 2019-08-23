@@ -10,7 +10,7 @@ createDB = function(req, res, next){
   
     const queryCreateDepartment = `CREATE TABLE IF NOT EXISTS department
     (id INT AUTO_INCREMENT PRIMARY KEY,
-     departmentName VARCHAR(255))`;
+     departmentName VARCHAR(255) UNIQUE)`;
     connection.query(queryCreateDepartment, (err, result) => {
       if (err) throw err;
       console.log("Table department created");
@@ -18,7 +18,7 @@ createDB = function(req, res, next){
   
     const queryCreateProgram = `CREATE TABLE IF NOT EXISTS program
     (id INT AUTO_INCREMENT PRIMARY KEY,
-     programName VARCHAR(255),
+     programName VARCHAR(255) UNIQUE,
      academicDegree ENUM('Bachelors', 'Masters'),
      departmentID INT,
      Foreign KEY (departmentID) references department(id)
@@ -47,6 +47,7 @@ createDB = function(req, res, next){
       subjectID INT, 
       examType ENUM('Regular', 'Back'), 
       date VARCHAR(10),
+      isFinished BOOLEAN,
       Foreign KEY (subjectID) references subject(id))`;
     connection.query(queryCreateExam, (err, result) => {
       if (err) throw err;
@@ -55,7 +56,7 @@ createDB = function(req, res, next){
   
     const queryCreatePackage = `CREATE TABLE IF NOT EXISTS package
     (id INT AUTO_INCREMENT PRIMARY KEY, 
-      packageCode VARCHAR(255),
+     packageCode VARCHAR(255),
      noOfCopies INT, 
      codeStart VARCHAR(255), 
      codeEnd VARCHAR(255),
@@ -70,7 +71,7 @@ createDB = function(req, res, next){
     const queryCreatePerson = `CREATE TABLE IF NOT EXISTS person
     (id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255), 
-      contact VARCHAR(10), 
+      contact VARCHAR(10) UNIQUE, 
       courseCode VARCHAR(255),
       programme VARCHAR(255),
       year_part VARCHAR(255),
@@ -91,7 +92,7 @@ createDB = function(req, res, next){
      dateOfAssignment VARCHAR(10), 
      dateOfSubmission VARCHAR(10),
      dateOfDeadline VARCHAR(10), 
-     packageID INT,
+     packageID INT UNIQUE,
      personID INT,
      Foreign KEY (personID) references person(id),
      Foreign KEY (packageID) references package(id))`;
