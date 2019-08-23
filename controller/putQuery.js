@@ -11,14 +11,47 @@ pool.getConnection((err, connection) => {
     const updateSubmission = `UPDATE assignment JOIN package ON assignment.packageID=package.id
     SET assignment.dateOfSubmission="${req.body.dateOfSubmission}", 
     package.status="Submitted"
-    WHERE package.id="${req.body.id}"`;
+    WHERE assignment.id=${req.body.id};
+    
+    SELECT assignment.id,status,count(*) as count, examID 
+    FROM assignment JOIN package ON packageID=package.id  
+    WHERE examID = 
+    (SELECT exam.id FROM 
+    assignment JOIN package ON packageID = package.id
+    JOIN exam ON examID = exam.id
+    WHERE assignment.id = ${req.body.id})
+    GROUP BY status
+    `;
 
-    connection.query(updateSubmission, (err, result) => {
+    connection.query(updateSubmission, [1, 2], (err, results) => {
       if (err) throw err;
       else {
         console.log("Submission Completed!!");
-        console.log(result);
-        res.status(200).send(result);
+        console.log(results);
+        console.log(results[0]);
+        console.log(results[1]);
+        const isCompleted = true;
+        let examID;
+        results[1].forEach(element => {
+          examID = element.examID;
+          if (
+            (element.status === "Not assigned" && element.count > 0) ||
+            (element.status === "Pending" && element.count > 0)
+          ) {
+            isCompleted = false;
+          }
+        });
+        console.log(examID);
+
+        if (isCompleted) {
+          const updateExam = `UPDATE exam 
+        SET isFinished= 1 
+        WHERE exam.id=${examID};`;
+          connection.query(updateExam, (err, results) => {
+            if (err) throw err;
+          });
+        }
+        res.status(200).send(results);
       }
     });
   });
