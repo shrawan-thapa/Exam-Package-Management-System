@@ -124,6 +124,20 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.get("/getOnepackage/:packageCode", (req,res)=>{
+    console.log(req.params.packageCode)
+    const getOnePackage= `SELECT packageCode, year, part, examID,subjectName,date as examDate,person.name as assignedTo, 
+    dateOfAssignment, dateOfSubmission FROM package JOIN exam JOIN subject JOIN assignment JOIN person WHERE person.id = assignment.personID 
+    AND package.id = assignment.packageID AND examID = exam.id AND exam.subjectID =subject.id AND packageCode="${req.params.packageCode}"`;
+    connection.query(getOnePackage, (err,result)=>{
+      if(err) throw err;
+      else{
+        console.log("Package Retured");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    })
+  });
+
   router.get("/getOneAssignment/:id", (req, res) => {
     const getOnePerson = `SELECT packageCode, campus, contact,dateOfSubmission, dateOfAssignment,name,dateofDeadline as dateOfDeadline from assignment JOIN person JOIN package where personID = person.id and packageID = package.id and assignment.id =${
       req.params.id
