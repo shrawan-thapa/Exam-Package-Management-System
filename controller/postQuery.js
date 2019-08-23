@@ -18,8 +18,7 @@ pool.getConnection((err, connection) => {
         .exists()
         .not()
         .isEmpty(),
-      check("examType")
-        .exists(),
+      check("examType").exists(),
       check("date")
         .exists()
         .not()
@@ -214,6 +213,22 @@ pool.getConnection((err, connection) => {
       });
     }
   });
+
+  axios({
+    method: "post",
+    url: "http://pcampus.edu.np/api/subjects/",
+    data: qs.stringify(data),
+    config: { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+  })
+    .then(resp => {
+      console.log(`statusCode: ${resp.statusCode}`);
+      console.log(resp.data);
+      res.status(200).send(resp.data);
+    })
+    .catch(error => {
+      console.error(error);
+      res.send(error);
+    });
 
   connection.release();
 });
