@@ -260,7 +260,7 @@ pool.getConnection((err, connection) => {
     });
   });
   router.get("/getProgramList", (req, res) => {
-    const getAllPerson = `SELECT * FROM program`;
+    const getAllPerson = `SELECT program.id,programName,departmentName,academicDegree FROM program JOIN department WHERE departmentID = department.id`;
     connection.query(getAllPerson, (err, result) => {
       if (err) throw err;
       else {

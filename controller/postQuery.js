@@ -8,11 +8,35 @@ const fetch = require("node-fetch");
 const router = express.Router();
 const axios = require("axios");
 const qs = require("qs");
+const multer = require("multer");
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+  cb(null, 'excelFile')
+},
+filename: function (req, file, cb) {
+  cb(null, Date.now() + '-' +file.originalname )
+}
+})
+var upload = multer({ storage: storage }).single('file')
+
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
+  router.post('/upload',function(req, res) {
+     
+    upload(req, res, function (err) {
+           if (err instanceof multer.MulterError) {
+               return res.status(500).json(err)
+           } else if (err) {
+               return res.status(500).json(err)
+           }
+      return res.status(200).send(req.file)
 
+    })
+
+});
   router.post(
     "/addExam",
     [
