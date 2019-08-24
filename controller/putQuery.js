@@ -118,6 +118,55 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.put("/editSubject/:id", (req, res) => {
+    const editSubjectQuery = `UPDATE subject
+    SET courseCode ="${req.body.courseCode}",
+    year ="${req.body.year}",
+    subjectName ="${req.body.subjectName}",
+    part ="${req.body.part}",
+    programID ="${req.body.programID}"
+    WHERE id="${req.params.id}"
+   
+    `;
+    connection.query(editSubjectQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Updated subject");
+        res.status(200).send(req.body);
+      }
+    });
+  });
+
+  router.put("/editProgram/:id", (req, res) => {
+    const editProgramQuery = `UPDATE program
+    SET programName ="${req.body.programName}",
+    academicDegree ="${req.body.academicDegree}",
+    departmentID ="${req.body.departmentID}"
+    WHERE id="${req.params.id}"
+    `;
+    connection.query(editProgramQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Updated program");
+        res.status(200).send(req.body);
+      }
+    });
+  });
+
+  router.put("/editDepartment/:id", (req, res) => {
+    const editDeparmentQuery = `UPDATE department
+    SET departmentName ="${req.body.departmentName}"
+    WHERE id="${req.params.id}"
+    `;
+    connection.query(editDeparmentQuery, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("Updated department");
+        res.status(200).send(req.body);
+      }
+    });
+  });
+
   connection.release();
 });
 module.exports = router;

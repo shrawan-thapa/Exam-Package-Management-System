@@ -10,6 +10,8 @@ const router = express.Router();
 
 // router.use(createDB);
 createDB();
+
+
 router.use('/query', postQuery);
 router.use('/query', getQuery);
 router.use('/query', putQuery);
