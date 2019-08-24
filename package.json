@@ -21,6 +21,7 @@
     "nodemon": "^1.19.1"
   },
   "dependencies": {
+    "ad-bs-converter": "^0.5.0",
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
     "config": "^3.1.0",
