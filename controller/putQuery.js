@@ -5,7 +5,10 @@ const { check, validationResult } = require("express-validator");
 const router = express.Router();
 
 pool.getConnection((err, connection) => {
-  if (err) throw err;
+  if (err){
+    console.log(err);
+    res.status(400).send(err); 
+   }
   console.log("Database Connected");
 
   router.put("/receivePackage", (req, res) => {
@@ -15,7 +18,10 @@ pool.getConnection((err, connection) => {
     WHERE package.id="${req.body.id}"`;
 
     connection.query(updateSubmission, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Submission Completed!!");
         console.log(result);
@@ -27,7 +33,10 @@ pool.getConnection((err, connection) => {
   router.put("/finishExam",(req, res) =>{
     const updateExam = `UPDATE exam SET exam.examState = "Finished" where exam.id = "${req.body.id}"`;
     connection.query(updateExam, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Exam finished!!");
         console.log(result);
@@ -54,7 +63,10 @@ pool.getConnection((err, connection) => {
     
     `;
     connection.query(editPersonQuery, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Updated person");
         res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
@@ -71,7 +83,10 @@ pool.getConnection((err, connection) => {
    
     `;
     connection.query(editExamQuery, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Updated exam");
         res.status(200).send(req.body);
@@ -91,7 +106,10 @@ pool.getConnection((err, connection) => {
    
     `;
     connection.query(editPackageQuery, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Updated package");
         res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
@@ -109,7 +127,13 @@ pool.getConnection((err, connection) => {
       WHERE id = "${req.params.id}"
     `;
     connection.query(editAssignmentCode, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Updated Assignment");
         res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
