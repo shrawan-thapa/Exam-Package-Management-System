@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
     cb(null, process.cwd() + "/excelFile/");
   },
   filename: function(req, file, cb) {
-    cb(null, "TeacherListA.xlsx");
+    cb(null, "TeacherList.xlsx");
   }
 });
 const upload = multer({
@@ -26,7 +26,19 @@ const upload = multer({
 pool.getConnection((err, connection) => {
   if (err) throw err;
   console.log("Database Connected");
+  router.post('/upload',function(req, res) {
+     
+    upload(req, res, function (err) {
+           if (err instanceof multer.MulterError) {
+               return res.status(500).json(err)
+           } else if (err) {
+               return res.status(500).json(err)
+           }
+      return res.status(200).send(req.file)
 
+    })
+
+});
   router.post(
     "/addExam",
     [
@@ -275,14 +287,14 @@ pool.getConnection((err, connection) => {
     const postDepartment = `
     INSERT INTO program 
     (programName, academicDegree, departmentID) 
-    VALUES ('${req.body.programName}', '${req.body.academicDegree}', ${req.body.departmentID})`;
+    VALUES ('${req.body.programName}', '${req.body.level}', ${req.body.departmentID})`;
     connection.query(postDepartment, (err, result) => {
       if (err) {
         console.log("Database Error");
         throw err;
       } else {
         console.log(`Inserted data in program ${result}`);
-        res.status(200).send(Object.assign(req.body, { id: result.insertId }));
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;      
       }
     });
   });
@@ -299,14 +311,45 @@ pool.getConnection((err, connection) => {
         throw err;
       } else {
         console.log(`Inserted data in subject ${result}`);
-        res.status(200).send(Object.assign(req.body, { id: result.insertId }));
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
       }
     });
   });
 
-  
+  router.post("/postExcel", (req, res) => {
+    const xlFile = xlReader.readFile(
+      process.cwd() + "/excelFile/TeacherList.xlsx"
+    );
+    console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
+    const JsonObj = xlParser(xlFile);
+    const JsonArray = JsonObj.ALL;
 
-  router.get("/initializeSubjects", async (req, res) => {
+    for (let i = 0; i < JsonArray.length; i++) {
+      const newPerson = `INSERT INTO person(id, name, contact, courseCode,
+  programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
+  jobType, email) VALUES 
+    (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
+        JsonArray[i]["Mobile No."]
+      }', '${JsonArray[i]["Course Code"]}',
+    '${JsonArray[i]["Programe"]}', '${JsonArray[i]["Year/Part"]}', '${
+        JsonArray[i]["Subject"]
+      }', '${JsonArray[i]["1 Campus Code"]}',
+     '${JsonArray[i]["Teaching Experience"]}', '${
+        JsonArray[i]["Eff. Exp. On this Subj. "]
+      }','${JsonArray[i]["Academic Qualification"]}',
+      '${
+        JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
+      }', '${JsonArray[i]["Email"]}')`;
+      connection.query(newPerson, (err, result) => {
+        if (err) throw err;
+        else {
+          console.log(`Inserted data in person ${result}`);
+          //res.status(200).send(result);
+        }
+      });
+    }
+  });
+  router.post("/initializeSubjects", async (req, res) => {
     const departmentList = [
       ["Department Of Civil Engineering"],
       ["Department of Mechanical Engineering"],

@@ -1,7 +1,7 @@
 const express = require("express");
 const routes = require("./routes");
 const bodyParser = require("body-parser");
-const path = require("path");
+const path = require('path');
 const app = express();
 
 //Middlewares
@@ -20,13 +20,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// app.use(express.static("public"));
+app.use(express.static("public"));
+// app.use(express.static(path.join(__dirname, 'build')));
 
-
-app.use(express.static(path.join(__dirname, 'build')));
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
-  });
+// app.get('*', function(req, res) {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
 app.use("/API", routes);
 
