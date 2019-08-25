@@ -71,7 +71,7 @@ createDB = function(req, res, next){
     const queryCreatePerson = `CREATE TABLE IF NOT EXISTS person
     (id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255), 
-      contact VARCHAR(10) UNIQUE, 
+      contact VARCHAR(30), 
       courseCode VARCHAR(255),
       programme VARCHAR(255),
       year_part VARCHAR(255),
