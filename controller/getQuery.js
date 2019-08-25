@@ -220,9 +220,10 @@ pool.getConnection((err, connection) => {
 
   router.get("/getNotAssignedExamPackages/:year/:part/:type", (req, res) => {
     console.log(req.params.type);
-    const getSubjectPackage = `SELECT package.id,packageCode, noOfCopies,codeStart,codeEnd FROM package
+    const getSubjectPackage = `SELECT package.id,packageCode, noOfCopies,codeStart,codeEnd, CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName, year, part, subjectName FROM package
     JOIN exam ON examID = exam.id
     JOIN subject ON subjectID = subject.id
+    JOIN program on programID = program.id
     WHERE status="Not Assigned" and part="${req.params.part}" AND date LIKE "${
       req.params.year
     }%" AND examType="${req.params.type}"`;
