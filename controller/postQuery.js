@@ -14,7 +14,7 @@ var storage = multer.diskStorage({
   cb(null, 'excelFile')
 },
 filename: function (req, file, cb) {
-  cb(null, Date.now() + '-' +file.originalname )
+  cb(null, 'TeacherList.xlsx')
 }
 })
 var upload = multer({ storage: storage }).single('file')
@@ -291,11 +291,7 @@ pool.getConnection((err, connection) => {
         throw err;
       } else {
         console.log(`Inserted data in program ${result}`);
-<<<<<<< HEAD
         res.status(200).json(Object.assign(req.body, { id: result.insertId }));;      
-=======
-        res.status(200).send(Object.assign(req.body, { id: result.insertId }));
->>>>>>> origin/sabal
       }
     });
   });
@@ -326,50 +322,7 @@ pool.getConnection((err, connection) => {
     const JsonArray = JsonObj.ALL;
 
     for (let i = 0; i < JsonArray.length; i++) {
-      const getPerson = `SELECT * FROM person WHERE person.name = '${
-        JsonArray[i]["Name of Teacher"]
-      }' AND
-        person.courseCode = "${JsonArray[i]["Course Code"]}" AND contact = '${
-        JsonArray[i]["Mobile No."]
-      }'
-         AND email = '${JsonArray[i]["Email"]}'`;
-      //const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id} `;
-      connection.query(getPerson, (err, result) => {
-        if (err) {
-          console.log(err);
-          res.status(400).send(err);
-        } else {
-          if (result === null) {
-            const newPerson = `INSERT INTO person(id, name, contact, courseCode,
-  programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
-  jobType, email) VALUES 
-    (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
-              JsonArray[i]["Mobile No."]
-            }', '${JsonArray[i]["Course Code"]}',
-    '${JsonArray[i]["Programe"]}', '${JsonArray[i]["Year/Part"]}', '${
-              JsonArray[i]["Subject"]
-            }', '${JsonArray[i]["1 Campus Code"]}',
-     '${JsonArray[i]["Teaching Experience"]}', '${
-              JsonArray[i]["Eff. Exp. On this Subj. "]
-            }','${JsonArray[i]["Academic Qualification"]}',
-      '${
-        JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
-      }', '${JsonArray[i]["Email"]}')`;
-
-            connection.query(newPerson, (err, result) => {
-              if (err) {
-                console.log(err);
-                res.status(400).send(err);
-              } else {
-                console.log(`Inserted data in person ${result}`);
-                //res.status(200).send(result);
-              }
-            });
-          }
-        }
-      });
-
-      /*const newPerson = `INSERT INTO person(id, name, contact, courseCode,
+      const newPerson = `INSERT INTO person(id, name, contact, courseCode,
   programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
   jobType, email) VALUES 
     (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
@@ -384,21 +337,15 @@ pool.getConnection((err, connection) => {
       '${
         JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
       }', '${JsonArray[i]["Email"]}')`;
-
-
-
       connection.query(newPerson, (err, result) => {
         if (err) throw err;
         else {
           console.log(`Inserted data in person ${result}`);
           //res.status(200).send(result);
         }
-      });*/
+      });
     }
-
-    res.status(200).send("Added");
   });
-
   router.post("/initializeSubjects", async (req, res) => {
     const departmentList = [
       ["Department Of Civil Engineering"],

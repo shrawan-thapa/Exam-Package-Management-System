@@ -334,7 +334,7 @@ pool.getConnection((err, connection) => {
     JOIN exam ON examID = exam.id
     JOIN subject ON subjectID = subject.id
     JOIN program on programID = program.id
-    WHERE status="Not Assigned" and part="${req.params.part}" AND date LIKE "${
+    WHERE status!="Pending" and part="${req.params.part}" AND date LIKE "${
       req.params.year
     }%" AND examType="${req.params.type}"`;
 
