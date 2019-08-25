@@ -10,11 +10,10 @@ pool.getConnection((err, connection) => {
   console.log("Database Connected");
 
   router.get("/getPendingPackages",  (req, res) => {
-    const pendingPackagequery = `SELECT assignmentID as id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted,
-        year,part, programName
+    const pendingPackagequery = `SELECT assignmentID as id, packageCode, year, part, programName, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted
           FROM person JOIN 
           (
-              SELECT assignment.id as assignmentID,dateofAssignment, dateofDeadline, packageCode, personID,packageID, year, part FROM
+              SELECT year, part, programName,assignment.id as assignmentID,dateofAssignment, dateofDeadline, packageCode, personID,packageID FROM
               assignment JOIN package
               ON packageID = package.id
               JOIN exam
@@ -23,9 +22,9 @@ pool.getConnection((err, connection) => {
               ON subjectID = subject.id
               JOIN program
               ON programID = program.id
-              WHERE status="Pending"
-          ) AS assn JOIN subject
-          ON person.id = assn.personID `;
+              WHERE status="Pending" AND isFinished=0
+          ) AS assn
+          ON person.id = assn.personID`;
 
     connection.query(pendingPackagequery, (err, result) => {
       if (err){
@@ -302,16 +301,18 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getPendingExamPackages/:year/:part/:type", (req, res) => {
-    const getSubjectPackage = `SELECT assignmentID as id, packageCode, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted
+    const getSubjectPackage = `SELECT id, packageCode, year, part, programName, dateofAssignment as assignedDate, name as assignedTo, contact, dateofDeadline as tobeSubmitted
     FROM person JOIN 
     (
-        SELECT assignment.id as assignmentID,packageCode, dateOfAssignment, dateOfDeadline, personID,subject.year, subject.part FROM
+        SELECT packageCode, dateOfAssignment, dateOfDeadline, personID, year, part, programName FROM
         assignment JOIN package
         ON packageID = package.id
         JOIN exam
         ON examID = exam.id
         JOIN subject
         ON subjectID = subject.id
+        JOIN program
+        ON programID = program.id
         WHERE status="Pending" AND part="${req.params.part}" AND date LIKE "${
       req.params.year
     }%"  AND examType="${req.params.type}"
