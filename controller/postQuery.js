@@ -3,7 +3,6 @@ const { pool } = require("../database");
 const { check, validationResult } = require("express-validator");
 const xlReader = require("xlsx");
 const xlParser = require("../xlParser");
-const http = require("http");
 const fetch = require("node-fetch");
 const router = express.Router();
 const axios = require("axios");
@@ -25,7 +24,7 @@ pool.getConnection((err, connection) => {
         .exists()
         .not()
         .isEmpty()
-    ],
+    ], 
     (req, res) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -36,7 +35,7 @@ pool.getConnection((err, connection) => {
       const postExams = `INSERT INTO exam (id, subjectID, examType, date) VALUES (${null}, ${
         req.body.subjectID
       }, '${req.body.examType}','${req.body.date}')`;
-      connection.query(postExams, (err, result) => {
+      connection.query(postExams,  (err, result) => {
         if (err) {
           console.log("Database Error");
           throw err;
@@ -84,7 +83,10 @@ pool.getConnection((err, connection) => {
         req.body.codeStart
       }', '${req.body.codeEnd}', ${req.body.examID}, 'Not Assigned')`;
       connection.query(postNewPack, (err, result) => {
-        if (err) throw err;
+        if (err){
+          console.log(err);
+          res.status(400).send(err); 
+         }
         else {
           console.log(`Inserted data in packages ${result}`);
           console.log(result.insertId);
@@ -138,7 +140,10 @@ pool.getConnection((err, connection) => {
         
         )`;
       connection.query(newPerson, (err, result) => {
-        if (err) throw err;
+        if (err){
+          console.log(err);
+          res.status(400).send(err); 
+         }
         else {
           console.log(`Inserted data in person ${result}`);
           res
@@ -149,7 +154,35 @@ pool.getConnection((err, connection) => {
     }
   );
 
-  router.post("/addAssignment", (req, res) => {
+
+  router.post("/getSemSubject", (req, res)=>{
+      data = {
+        'prog':req.body.prog,
+        'year':req.body.year,
+        'part':req.body.part
+    }
+    console.log(data);
+    
+   axios({
+      method: 'post',
+      url: 'http://pcampus.edu.np/api/subjects/',
+      data:qs.stringify(data),
+      config: { headers: {'Content-Type': 'application/x-www-form-urlencoded' }}
+      })
+.then((resp) => {
+  console.log(`statusCode: ${resp.statusCode}`)
+  console.log(resp.data)
+  res.status(200).send(resp.data);
+})
+.catch((error) => {
+  console.error(error)
+  res.send(error)
+});
+    
+
+  });
+
+  router.post("/addAssignment",  (req, res) => {
     const packageIDs = req.body.packages;
     insertList = packageIDs.map(element => {
       return [
@@ -173,9 +206,40 @@ pool.getConnection((err, connection) => {
     WHERE id IN (?);
     `;
     connection.query(assignQ, [insertList, packageIDs], (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log(`Inserted data in assignment ${result}`);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));
+      }
+    });
+  });
+
+  router.post("/addDepartment", (req, res) => {
+    const depQuery = `INSERT INTO department (id, departmentName) VALUES (null, '${req.body.departmentName}')`;
+    connection.query(depQuery, (err, result) => {
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
+      else {
+        console.log(`Inserted data in department ${result}`);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));
+      }
+    });
+  });
+
+  router.post("/addProgram", (req, res) => {
+    const progQuery = `INSERT INTO program (id, programName, academicDegree, departmentID) VALUES (null, '${req.body.programName}', '${req.body.academicDegree}',${req.body.departmentID})`;
+    connection.query(progQuery, (err, result) => {
+      if (err) {
+        console.log(err);
+        re.status(400).send(err);
+      }
+      else {
+        console.log(`Inserted data in program ${result}`);
         res.status(200).json(Object.assign(req.body, { id: result.insertId }));
       }
     });
@@ -240,7 +304,19 @@ pool.getConnection((err, connection) => {
     const JsonArray = JsonObj.ALL;
 
     for (let i = 0; i < JsonArray.length; i++) {
-      const newPerson = `INSERT INTO person(id, name, contact, courseCode,
+      
+      const getPerson = `SELECT * FROM person WHERE person.name = '${JsonArray[i]["Name of Teacher"]}' AND
+        person.courseCode = "${JsonArray[i]["Course Code"]}" AND contact = '${JsonArray[i]["Mobile No."]}'
+         AND email = '${JsonArray[i]["Email"]}'`;
+       //const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id} `;
+       connection.query(getPerson, (err, result) => {
+        if (err){
+          console.log(err);
+          res.status(400).send(err); 
+         }
+        else {
+          if(result === null){
+               const newPerson = `INSERT INTO person(id, name, contact, courseCode,
   programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
   jobType, email) VALUES 
     (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
@@ -255,14 +331,51 @@ pool.getConnection((err, connection) => {
       '${
         JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
       }', '${JsonArray[i]["Email"]}')`;
+
+
+
+      connection.query(newPerson, (err, result) => {
+        if (err){
+          console.log(err);
+          res.status(400).send(err); 
+         }
+        else {
+          console.log(`Inserted data in person ${result}`);
+          //res.status(200).send(result);
+        }
+      });
+          }
+        }
+      });
+
+      /*const newPerson = `INSERT INTO person(id, name, contact, courseCode,
+  programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
+  jobType, email) VALUES 
+    (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
+        JsonArray[i]["Mobile No."]
+      }', '${JsonArray[i]["Course Code"]}',
+    '${JsonArray[i]["Programe"]}', '${JsonArray[i]["Year/Part"]}', '${
+        JsonArray[i]["Subject"]
+      }', '${JsonArray[i]["1 Campus Code"]}',
+     '${JsonArray[i]["Teaching Experience"]}', '${
+        JsonArray[i]["Eff. Exp. On this Subj. "]
+      }','${JsonArray[i]["Academic Qualification"]}',
+      '${
+        JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
+      }', '${JsonArray[i]["Email"]}')`;
+
+
+
       connection.query(newPerson, (err, result) => {
         if (err) throw err;
         else {
           console.log(`Inserted data in person ${result}`);
           //res.status(200).send(result);
         }
-      });
+      });*/
     }
+
+    res.status(200).send("Added");
   });
 
   router.post("/initializeSubjects", async (req, res) => {

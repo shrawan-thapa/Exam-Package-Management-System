@@ -30,7 +30,7 @@ createDB = function(req, res, next){
   
     const queryCreateSubject = `CREATE TABLE IF NOT EXISTS subject
     (id INT AUTO_INCREMENT PRIMARY KEY,
-      courseCode VARCHAR(255),
+      courseCode VARCHAR(255) UNIQUE,
       year ENUM('I', 'II','III','IV'),
       subjectName VARCHAR(255),
       part ENUM('I', 'II'),
@@ -81,7 +81,7 @@ createDB = function(req, res, next){
       experienceinthisSubj VARCHAR(255),
       academicQualification VARCHAR(255),
       jobType VARCHAR(255),
-      email VARCHAR(255))`;
+      email VARCHAR(255) UNIQUE)`;
     connection.query(queryCreatePerson, (err, result) => {
       if (err) throw err;
       console.log("Table person created");
