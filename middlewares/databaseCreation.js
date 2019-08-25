@@ -21,7 +21,7 @@ createDB = function(req, res, next) {
      programName VARCHAR(255) UNIQUE,
      academicDegree ENUM('Bachelors', 'Masters'),
      departmentID INT,
-     Foreign KEY (departmentID) references department(id)
+     Foreign KEY (departmentID) references department(id) ON DELETE CASCADE
      )`;
     connection.query(queryCreateProgram, (err, result) => {
       if (err) throw err;
@@ -35,7 +35,7 @@ createDB = function(req, res, next) {
       subjectName VARCHAR(255),
       part ENUM('I', 'II'),
       programID INT,
-      Foreign KEY (programID) references program(id)
+      Foreign KEY (programID) references program(id) ON DELETE CASCADE
      )`;
     connection.query(queryCreateSubject, (err, result) => {
       if (err) throw err;
@@ -48,7 +48,7 @@ createDB = function(req, res, next) {
       examType ENUM('Regular', 'Back'), 
       date VARCHAR(10),
       isFinished BOOLEAN,
-      Foreign KEY (subjectID) references subject(id))`;
+      Foreign KEY (subjectID) references subject(id) ON DELETE CASCADE)`;
     connection.query(queryCreateExam, (err, result) => {
       if (err) throw err;
       console.log("Table exam created");
@@ -61,7 +61,7 @@ createDB = function(req, res, next) {
      codeStart VARCHAR(255), 
      codeEnd VARCHAR(255),
      examID INT ,
-     Foreign KEY (examID) references exam(id) , 
+     Foreign KEY (examID) references exam(id) ON DELETE CASCADE , 
      status ENUM('Not Assigned','Pending', 'Submitted'))`;
     connection.query(queryCreatePackage, (err, result) => {
       if (err) throw err;
@@ -94,8 +94,8 @@ createDB = function(req, res, next) {
      dateOfDeadline VARCHAR(10), 
      packageID INT UNIQUE,
      personID INT,
-     Foreign KEY (personID) references person(id),
-     Foreign KEY (packageID) references package(id))`;
+     Foreign KEY (personID) references person(id) ON DELETE CASCADE,
+     Foreign KEY (packageID) references package(id) ON DELETE CASCADE)`;
     connection.query(queryCreateAss, (err, result) => {
       if (err) throw err;
       console.log("Table assignment created");

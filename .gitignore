@@ -1,7 +1,4 @@
 .vscode/*
 /node_modules
 /build
-<<<<<<< HEAD
-/iisnode
-=======
->>>>>>> origin/sabal
+/excelFile
