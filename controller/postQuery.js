@@ -206,6 +206,55 @@ pool.getConnection((err, connection) => {
   });
   //obj[0]["result on date"]
 
+  router.post("/addDepartment", (req, res) => {
+    const postDepartment = `
+    INSERT INTO department 
+    (departmentName) 
+    VALUES ('${req.body.departmentName}')`;
+    connection.query(postDepartment, (err, result) => {
+      if (err) {
+        console.log("Database Error");
+        throw err;
+      } else {
+        console.log(`Inserted data in department ${result}`);
+        res.status(200).send();
+      }
+    });
+  });
+
+  router.post("/addProgram", (req, res) => {
+    const postDepartment = `
+    INSERT INTO program 
+    (programName, academicDegree, departmentID) 
+    VALUES ('${req.body.programName}', '${req.body.level}', ${req.body.departmentID})`;
+    connection.query(postDepartment, (err, result) => {
+      if (err) {
+        console.log("Database Error");
+        throw err;
+      } else {
+        console.log(`Inserted data in program ${result}`);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;      
+      }
+    });
+  });
+
+  router.post("/addSubject", (req, res) => {
+    const postDepartment = `
+    INSERT INTO subject 
+    (courseCode, year, subjectName, part, programID) 
+    VALUES ('${req.body.courseCode}', '${req.body.year}', '${req.body.subjectName}',
+    '${req.body.part}', ${req.body.programID})`;
+    connection.query(postDepartment, (err, result) => {
+      if (err) {
+        console.log("Database Error");
+        throw err;
+      } else {
+        console.log(`Inserted data in subject ${result}`);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
+      }
+    });
+  });
+
   router.post("/postExcel", (req, res) => {
     const xlFile = xlReader.readFile(
       process.cwd() + "/excelFile/TeacherList.xlsx"

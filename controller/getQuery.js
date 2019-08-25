@@ -100,7 +100,7 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getAllPackages", (req, res) => {
-    const getPack = `SELECT p.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName,year,part,subjectName,status FROM package as p JOIN exam as
+    const getPack = `SELECT p.id,packageCode, noOfCopies,codeStart,codeEnd,CONCAT(programName,'(',year,'/',part,')','-',courseCode,' ',date) as examName, year, part, subjectName, status FROM package as p JOIN exam as
      e on p.examID = e.id JOIN subject as s ON
      e.subjectID = s.id JOIN program as pr on pr.id = s.programID
      WHERE e.isFinished != 1
