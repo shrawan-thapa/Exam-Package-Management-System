@@ -6,8 +6,12 @@ const adbs = require("ad-bs-converter");
 const router = express.Router();
 
 pool.getConnection((err, connection) => {
-  if (err) throw err;
+  if (err){
+    console.log(err);
+    res.status(400).send(err); 
+   }
   console.log("Database Connected");
+
   router.put("/receivePackage", (req, res) => {
     /*
     3 queries
@@ -137,10 +141,13 @@ pool.getConnection((err, connection) => {
     
     `;
     connection.query(editPersonQuery, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Updated person");
-        res.status(200).send(req.body);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
       }
     });
   });
@@ -154,7 +161,10 @@ pool.getConnection((err, connection) => {
    
     `;
     connection.query(editExamQuery, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Updated exam");
         res.status(200).send(req.body);
@@ -173,10 +183,37 @@ pool.getConnection((err, connection) => {
    
     `;
     connection.query(editPackageQuery, (err, result) => {
-      if (err) throw err;
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
       else {
         console.log("Updated package");
-        res.status(200).send(req.body);
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
+      }
+    });
+  });
+
+  router.put("/editAssignment/:id", (req, res) =>{
+    const editAssignmentCode = ` UPDATE assignment
+      SET dateOfAssignment = "${req.body.dateOfAssignment}",
+      dateOfSubmission = "${req.body.dateOfSubmission}",
+      noOfPackets = "${req.body.noOfPackets}",
+      packageID = "${req.body.packageID}",
+      personID = "${req.body.personID}"
+      WHERE id = "${req.params.id}"
+    `;
+    connection.query(editAssignmentCode, (err, result) => {
+      if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }if (err){
+        console.log(err);
+        res.status(400).send(err); 
+       }
+      else {
+        console.log("Updated Assignment");
+        res.status(200).json(Object.assign(req.body, { id: result.insertId }));;
       }
     });
   });
