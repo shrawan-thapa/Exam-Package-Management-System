@@ -7,6 +7,21 @@ const fetch = require("node-fetch");
 const router = express.Router();
 const axios = require("axios");
 const qs = require("qs");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  //multers disk storage settings
+  destination: function(req, file, cb) {
+    cb(null, process.cwd() + "/excelFile/");
+  },
+  filename: function(req, file, cb) {
+    cb(null, "TeacherListA.xlsx");
+  }
+});
+const upload = multer({
+  //multer settings
+  storage: storage
+}).single("file");
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
@@ -289,103 +304,25 @@ pool.getConnection((err, connection) => {
     });
   });
 
-  router.post("/postExcel", (req, res) => {
-    const xlFile = xlReader.readFile(
-      process.cwd() + "/excelFile/TeacherList.xlsx"
-    );
-    console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
-    const JsonObj = xlParser(xlFile);
-    const JsonArray = JsonObj.ALL;
+  
 
-    for (let i = 0; i < JsonArray.length; i++) {
-      const getPerson = `SELECT * FROM person WHERE person.name = '${
-        JsonArray[i]["Name of Teacher"]
-      }' AND
-        person.courseCode = "${JsonArray[i]["Course Code"]}" AND contact = '${
-        JsonArray[i]["Mobile No."]
-      }'
-         AND email = '${JsonArray[i]["Email"]}'`;
-      //const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id} `;
-      connection.query(getPerson, (err, result) => {
-        if (err) {
-          console.log(err);
-          res.status(400).send(err);
-        } else {
-          if (result === null) {
-            const newPerson = `INSERT INTO person(id, name, contact, courseCode,
-  programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
-  jobType, email) VALUES 
-    (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
-              JsonArray[i]["Mobile No."]
-            }', '${JsonArray[i]["Course Code"]}',
-    '${JsonArray[i]["Programe"]}', '${JsonArray[i]["Year/Part"]}', '${
-              JsonArray[i]["Subject"]
-            }', '${JsonArray[i]["1 Campus Code"]}',
-     '${JsonArray[i]["Teaching Experience"]}', '${
-              JsonArray[i]["Eff. Exp. On this Subj. "]
-            }','${JsonArray[i]["Academic Qualification"]}',
-      '${
-        JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
-      }', '${JsonArray[i]["Email"]}')`;
-
-            connection.query(newPerson, (err, result) => {
-              if (err) {
-                console.log(err);
-                res.status(400).send(err);
-              } else {
-                console.log(`Inserted data in person ${result}`);
-                //res.status(200).send(result);
-              }
-            });
-          }
-        }
-      });
-
-      /*const newPerson = `INSERT INTO person(id, name, contact, courseCode,
-  programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
-  jobType, email) VALUES 
-    (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
-        JsonArray[i]["Mobile No."]
-      }', '${JsonArray[i]["Course Code"]}',
-    '${JsonArray[i]["Programe"]}', '${JsonArray[i]["Year/Part"]}', '${
-        JsonArray[i]["Subject"]
-      }', '${JsonArray[i]["1 Campus Code"]}',
-     '${JsonArray[i]["Teaching Experience"]}', '${
-        JsonArray[i]["Eff. Exp. On this Subj. "]
-      }','${JsonArray[i]["Academic Qualification"]}',
-      '${
-        JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
-      }', '${JsonArray[i]["Email"]}')`;
-
-
-
-      connection.query(newPerson, (err, result) => {
-        if (err) throw err;
-        else {
-          console.log(`Inserted data in person ${result}`);
-          //res.status(200).send(result);
-        }
-      });*/
-    }
-
-    res.status(200).send("Added");
-  });
-
-  router.post("/initializeSubjects", async (req, res) => {
+  router.get("/initializeSubjects", async (req, res) => {
     const departmentList = [
       ["Department Of Civil Engineering"],
       ["Department of Mechanical Engineering"],
       ["Department of Electrical Engineering"],
-      ["Department of Electronics and Computer Engineering"]
+      ["Department of Electronics and Computer Engineering"],
+      ["Department of Architecture"],
     ];
     const programList = [
       ["BCT", "Bachelors", 4],
       ["BEX", "Bachelors", 4],
       ["BCE", "Bachelors", 1],
       ["BEL", "Bachelors", 3],
-      ["BME", "Bachelors", 2]
+      ["BME", "Bachelors", 2],
+      ["BAE", "Bachelors", 5]
     ];
-    const progs = ["BCT", "BEX", "BCE", "BEL", "BME"];
+    const progs = ["BCT", "BEX", "BCE", "BEL", "BME", "BAE"];
     const years = [1, 2, 3, 4];
     const parts = [1, 2];
 
@@ -449,6 +386,7 @@ pool.getConnection((err, connection) => {
                     throw err;
                   } else {
                     console.log(`Inserted subjects`);
+                    res.status(200).send();
                   }
                 }
               );

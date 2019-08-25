@@ -30,7 +30,7 @@ createDB = function(req, res, next){
   
     const queryCreateSubject = `CREATE TABLE IF NOT EXISTS subject
     (id INT AUTO_INCREMENT PRIMARY KEY,
-      courseCode VARCHAR(255) UNIQUE,
+      courseCode VARCHAR(255),
       year ENUM('I', 'II','III','IV'),
       subjectName VARCHAR(255),
       part ENUM('I', 'II'),
