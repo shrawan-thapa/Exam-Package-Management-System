@@ -211,6 +211,46 @@ pool.getConnection((err, connection) => {
     });
   });
 
+  router.get("/getOneDepartment/:id", (req, res) => {
+    const getOneDepartment = `SELECT * 
+    FROM department
+    where id =${req.params.id}; `;
+    connection.query(getOneDepartment, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("One Department returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
+  router.get("/getOneProgram/:id", (req, res) => {
+    const getOneProgram = `SELECT *
+    FROM program
+    WHERE id=${req.params.id}; `;
+    connection.query(getOneProgram, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("One program returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
+  router.get("/getOneSubject/:id", (req, res) => {
+    const getOnePerson = `SELECT courseCode, year, part,subjectName, programID, academicDegree
+    FROM subject JOIN program ON programID = program.id 
+    WHERE subject.id=${req.params.id}; `;
+    connection.query(getOnePerson, (err, result) => {
+      if (err) throw err;
+      else {
+        console.log("One Assignment returned!!");
+        res.status(200).send(JSON.parse(JSON.stringify(result)));
+      }
+    });
+  });
+
+
   router.get("/getPackage/:id", (req, res) => {
     const getOnePerson = `SELECT packageCode, noOfCopies, codeStart,codeEnd, academicDegree, programName, year, part, subjectID, examID  
     FROM package JOIN exam
