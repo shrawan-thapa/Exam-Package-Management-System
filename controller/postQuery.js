@@ -12,7 +12,21 @@ const router = express.Router();
 const axios = require('axios');
 const FormData = require('form-data');
 const qs = require('qs');
-var multiparty = require('multiparty');
+const multer = require('multer');
+const fs = require('fs');
+
+const storage = multer.diskStorage({ //multers disk storage settings
+  destination: function (req, file, cb) {
+      cb(null, process.cwd() + "/excelFile/")
+  },
+  filename: function (req, file, cb) {
+      cb(null, 'TeacherListA.xlsx')
+  }
+});
+const upload = multer({ //multer settings
+              storage: storage
+          }).single('file');
+
 
 pool.getConnection((err, connection) => {
   if (err) throw err;
@@ -254,57 +268,69 @@ pool.getConnection((err, connection) => {
   //obj[0]["result on date"]
 
   router.post("/postExcel", (req, res) => {
-    const xlFile = xlReader.readFile(
-      process.cwd() + "/excelFile/TeacherList.xlsx"
-    );
-    console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
-    const JsonObj = xlParser(xlFile);
-    const JsonArray = JsonObj.ALL;
+    
 
-    for (let i = 0; i < JsonArray.length; i++) {
-      
-      const getPerson = `SELECT * FROM person WHERE person.name = '${JsonArray[i]["Name of Teacher"]}' AND
-        person.courseCode = "${JsonArray[i]["Course Code"]}" AND contact = '${JsonArray[i]["Mobile No."]}'
-         AND email = '${JsonArray[i]["Email"]}'`;
-       //const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id} `;
-       connection.query(getPerson, (err, result) => {
-        if (err){
-          console.log(err);
-          res.status(400).send(err); 
-         }
-        else {
-          if(result === null){
-               const newPerson = `INSERT INTO person(id, name, contact, courseCode,
-  programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
-  jobType, email) VALUES 
-    (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
-        JsonArray[i]["Mobile No."]
-      }', '${JsonArray[i]["Course Code"]}',
-    '${JsonArray[i]["Programe"]}', '${JsonArray[i]["Year/Part"]}', '${
-        JsonArray[i]["Subject"]
-      }', '${JsonArray[i]["1 Campus Code"]}',
-     '${JsonArray[i]["Teaching Experience"]}', '${
-        JsonArray[i]["Eff. Exp. On this Subj. "]
-      }','${JsonArray[i]["Academic Qualification"]}',
-      '${
-        JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
-      }', '${JsonArray[i]["Email"]}')`;
+    upload(req,res,function(err){
+      if(err){
+           res.json({error_code:1,err_desc:err});
+           return;
+      }
 
-
-
-      connection.query(newPerson, (err, result) => {
-        if (err){
-          console.log(err);
-          res.status(400).send(err); 
-         }
-        else {
-          console.log(`Inserted data in person ${result}`);
-          //res.status(200).send(result);
-        }
-      });
+      const xlFile = xlReader.readFileSync(
+        process.cwd() + "/excelFile/TeacherListA.xlsx"
+      );
+      console.log(`${process.cwd()}/excelFile/TeacherListA.xlsx`);
+      const JsonObj = xlParser(xlFile);
+      const JsonArray = JsonObj.ALL;
+  
+      for (let i = 0; i < JsonArray.length; i++) {
+        
+        const getPerson = `SELECT * FROM person WHERE person.name = '${JsonArray[i]["Name of Teacher"]}' AND
+          person.courseCode = "${JsonArray[i]["Course Code"]}" AND contact = '${JsonArray[i]["Mobile No."]}'
+           AND email = '${JsonArray[i]["Email"]}'`;
+         //const getOnePerson = `SELECT * FROM person WHERE id = ${req.params.id} `;
+         connection.query(getPerson, (err, result) => {
+          if (err){
+            console.log(err);
+            res.status(400).send(err); 
+           }
+          else {
+            if(result === null){
+                 const newPerson = `INSERT INTO person(id, name, contact, courseCode,
+    programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
+    jobType, email) VALUES 
+      (${null}, '${JsonArray[i]["Name of Teacher"]}', '${
+          JsonArray[i]["Mobile No."]
+        }', '${JsonArray[i]["Course Code"]}',
+      '${JsonArray[i]["Programe"]}', '${JsonArray[i]["Year/Part"]}', '${
+          JsonArray[i]["Subject"]
+        }', '${JsonArray[i]["1 Campus Code"]}',
+       '${JsonArray[i]["Teaching Experience"]}', '${
+          JsonArray[i]["Eff. Exp. On this Subj. "]
+        }','${JsonArray[i]["Academic Qualification"]}',
+        '${
+          JsonArray[i]["Type of service: \r\n(Permanent/Contract/Part-time)"]
+        }', '${JsonArray[i]["Email"]}')`;
+  
+  
+  
+        connection.query(newPerson, (err, result) => {
+          if (err){
+            console.log(err);
+            res.status(400).send(err); 
+           }
+          else {
+            console.log(`Inserted data in person ${result}`);
+            //res.status(200).send(result);
           }
-        }
-      });
+        });
+            }
+          }
+        });
+
+
+ 
+    
 
       /*const newPerson = `INSERT INTO person(id, name, contact, courseCode,
   programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
@@ -332,6 +358,8 @@ pool.getConnection((err, connection) => {
         }
       });*/
     }
+
+  });
 
     res.status(200).send("Added");
   });
