@@ -349,7 +349,7 @@ pool.getConnection((err, connection) => {
       });
     }
   });
-  router.post("/initializeSubjects", async (req, res) => {
+  router.get("/initializeSubjects", async (req, res) => {
     const departmentList = [
       ["Department Of Civil Engineering"],
       ["Department of Mechanical Engineering"],
