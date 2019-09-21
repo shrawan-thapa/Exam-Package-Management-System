@@ -320,46 +320,52 @@ pool.getConnection((err, connection) => {
     console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
     const JsonObj = xlParser(xlFile);
     const JsonArray = JsonObj.ALL;
+    
 
     for (let i = 0; i < JsonArray.length; i++) {
-      const getPerson = `SELECT * from person where name = '${
+      const getPerson = `SELECT * from person where name = "${
         JsonArray[i]["Name of Teacher"]
-      }' and 
-        contact = '${JsonArray[i]["Mobile No."]}' and courseCode = '${
+      }" and 
+        contact = "${JsonArray[i]["Mobile No."]}" and courseCode = "${
         JsonArray[i]["Course Code"]
-      }'`;
+      }"`;
       connection.query(getPerson, (err, result) => {
         if (err) throw err;
         else {
+          console.log(i, " ", result.length);
           if (result.length == 0) {
             const newPerson = `INSERT INTO person(id, name, contact, courseCode,
                     programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
                     jobType, email) VALUES 
-                      (${null}, '${JsonArray[i]["Name of Teacher"]}', 
-                      '${JsonArray[i]["Mobile No."]}', '${
+                      (${null}, "${JsonArray[i]["Name of Teacher"]}", 
+                      "${JsonArray[i]["Mobile No."]}", "${
               JsonArray[i]["Course Code"]
-            }',
-                      '${JsonArray[i]["Programe"]}', '${
+            }",
+                      "${JsonArray[i]["Programe"]}", "${
               JsonArray[i]["Year/Part"]
-            }', '${JsonArray[i]["Subject"]}', '${
+            }", "${JsonArray[i]["Subject"]}", "${
               JsonArray[i]["1 Campus Code"]
-            }',
-                       '${JsonArray[i]["Teaching Experience"]}', '${
+            }",
+                       "${JsonArray[i]["Teaching Experience"]}", "${
               JsonArray[i]["Eff. Exp. On this Subj. "]
-            }','${JsonArray[i]["Academic Qualification"]}',
-                        '${
+            }", "${JsonArray[i]["Academic Qualification"]}",
+                        "${
                           JsonArray[i][
                             "Type of service: \r\n(Permanent/Contract/Part-time)"
                           ]
-                        }', '${JsonArray[i]["Email"]}')`;
+                        }", "${JsonArray[i]["Email"]}")`;
             connection.query(newPerson, (err, result) => {
               if (err) throw err;
               else {
                 console.log(`Inserted data in person ${result}`);
-                //res.status(200).send(result);
+                // res.status(200).send(result);
               }
             });
           }
+        }
+
+        if (i === JsonArray.length - 1) {
+          res.status(200).send(result);
         }
       });
     }
