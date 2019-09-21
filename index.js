@@ -21,13 +21,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
-// app.use(express.static(path.join(__dirname, 'build')));
-
-// app.get('*', function(req, res) {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
-
 app.use("/API", routes);
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 
 //PORT
 const port = process.env.PORT || 4000;

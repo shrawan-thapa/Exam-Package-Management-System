@@ -320,8 +320,17 @@ pool.getConnection((err, connection) => {
     console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
     const JsonObj = xlParser(xlFile);
     const JsonArray = JsonObj.ALL;
+    
+    String.prototype.replaceAll = function (find, replace) {
+        var str = this;
+        return str.replace(new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), replace);
+    };
 
     for (let i = 0; i < JsonArray.length; i++) {
+
+      for (let key in JsonArray[i]){
+          JsonArray[i][key] = JsonArray[i][key].toString().replaceAll("'","")
+      }
       const getPerson = `SELECT * from person where name = '${
         JsonArray[i]["Name of Teacher"]
       }' and 
@@ -331,14 +340,14 @@ pool.getConnection((err, connection) => {
       connection.query(getPerson, (err, result) => {
         if (err) throw err;
         else {
-          if (result.length == 0) {
+          if (0=== 0) {
             const newPerson = `INSERT INTO person(id, name, contact, courseCode,
                     programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
                     jobType, email) VALUES 
                       (${null}, '${JsonArray[i]["Name of Teacher"]}', 
                       '${JsonArray[i]["Mobile No."]}', '${
-              JsonArray[i]["Course Code"]
-            }',
+                      JsonArray[i]["Course Code"]
+                      }',
                       '${JsonArray[i]["Programe"]}', '${
               JsonArray[i]["Year/Part"]
             }', '${JsonArray[i]["Subject"]}', '${
@@ -363,6 +372,7 @@ pool.getConnection((err, connection) => {
         }
       });
     }
+    res.status(200).send()
   });
   router.get("/initializeSubjects", async (req, res) => {
     const departmentList = [
@@ -434,7 +444,7 @@ pool.getConnection((err, connection) => {
               //   res.status(200).send(resp.data);
               console.log(subjectList);
 
-              const initializeSubjects = `INSERT INTO subject (courseCode, subjectName, year, part, programID) VALUES ?    `;
+              const initializeSubjects = `INSERT INTO subject (courseCode, subjectName, year, part, programID) VALUES ?`;
               connection.query(
                 initializeSubjects,
                 [subjectList],

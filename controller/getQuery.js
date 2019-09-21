@@ -363,6 +363,7 @@ pool.getConnection((err, connection) => {
   });
 
   router.get("/getDepartmentList",  (req, res) => {
+    console.log("Here")
     const getAllPerson = `SELECT * FROM department`;
     connection.query(getAllPerson, (err, result) => {
       if (err){
