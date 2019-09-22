@@ -320,6 +320,7 @@ pool.getConnection((err, connection) => {
     console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
     const JsonObj = xlParser(xlFile);
     const JsonArray = JsonObj.ALL;
+	var count = 0;
     
 
     for (let i = 0; i < JsonArray.length; i++) {
@@ -358,15 +359,22 @@ pool.getConnection((err, connection) => {
               if (err) throw err;
               else {
                 console.log(`Inserted data in person ${result}`);
+				count += 1;
                 // res.status(200).send(result);
+				if (count === JsonArray.length - 1) {
+				  res.status(200).send(result);
+				}
               }
             });
-          }
+          } else{
+			  count += 1;
+			  
+				if (count === JsonArray.length - 1) {
+				  res.status(200).send(result);
+				}
+		  }
         }
 
-        if (i === JsonArray.length - 1) {
-          res.status(200).send(result);
-        }
       });
     }
   });
