@@ -328,47 +328,57 @@ pool.getConnection((err, connection) => {
 
     for (let i = 0; i < JsonArray.length; i++) {
 
+     // console.log("xx",JsonArray[0])
       for (let key in JsonArray[i]){
-          JsonArray[i][key] = JsonArray[i][key].toString().replaceAll("'","")
+        if(key=='Course Code') 
+          JsonArray[i][key] = JsonArray[i][key].toString().replaceAll(" ","").replaceAll("'","")
+        else
+        JsonArray[i][key] = JsonArray[i][key].toString().replaceAll("'","")
+        
       }
       const getPerson = `SELECT * from person where name = '${
         JsonArray[i]["Name of Teacher"]
-      }' and 
-        contact = '${JsonArray[i]["Mobile No."]}' and courseCode = '${
+      }" and 
+        contact = "${JsonArray[i]["Mobile No."]}" and courseCode = "${
         JsonArray[i]["Course Code"]
-      }'`;
+      }"`;
       connection.query(getPerson, (err, result) => {
         if (err) throw err;
         else {
-          if (0=== 0) {
+          console.log(i, " ", result.length);
+          if (result.length == 0) {
             const newPerson = `INSERT INTO person(id, name, contact, courseCode,
                     programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
                     jobType, email) VALUES 
-                      (${null}, '${JsonArray[i]["Name of Teacher"]}', 
-                      '${JsonArray[i]["Mobile No."]}', '${
-                      JsonArray[i]["Course Code"]
-                      }',
-                      '${JsonArray[i]["Programe"]}', '${
+                      (${null}, "${JsonArray[i]["Name of Teacher"]}", 
+                      "${JsonArray[i]["Mobile No."]}", "${
+              JsonArray[i]["Course Code"]
+            }",
+                      "${JsonArray[i]["Programe"]}", "${
               JsonArray[i]["Year/Part"]
-            }', '${JsonArray[i]["Subject"]}', '${
+            }", "${JsonArray[i]["Subject"]}", "${
               JsonArray[i]["1 Campus Code"]
-            }',
-                       '${JsonArray[i]["Teaching Experience"]}', '${
+            }",
+                       "${JsonArray[i]["Teaching Experience"]}", "${
               JsonArray[i]["Eff. Exp. On this Subj. "]
-            }','${JsonArray[i]["Academic Qualification"]}',
-                        '${
+            }", "${JsonArray[i]["Academic Qualification"]}",
+                        "${
                           JsonArray[i][
                             "Type of service: \r\n(Permanent/Contract/Part-time)"
                           ]
-                        }', '${JsonArray[i]["Email"]}')`;
+                        }", "${JsonArray[i]["Email"]}")`;
             connection.query(newPerson, (err, result) => {
               if (err) throw err;
               else {
                 console.log(`Inserted data in person ${result}`);
-                //res.status(200).send(result);
+                // res.status(200).send(result);
               }
             });
           }
+        }
+
+        if (i === JsonArray.length - 1) {
+          res.status(200).send(result);
         }
       });
     }
