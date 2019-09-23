@@ -9,6 +9,8 @@ const axios = require("axios");
 const qs = require("qs");
 const multer = require("multer");
 
+
+
 const storage = multer.diskStorage({
   //multers disk storage settings
   destination: function(req, file, cb) {
@@ -313,61 +315,146 @@ pool.getConnection((err, connection) => {
     });
   });
 
+
+
+
   router.post("/postExcel", (req, res) => {
     const xlFile = xlReader.readFile(
       process.cwd() + "/excelFile/TeacherList.xlsx"
     );
-    console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
+
+    function get_header_row(sheet) {
+      var headers = [];
+      var range = xlReader.utils.decode_range(sheet['!ref']);
+      var C, R = range.s.r; /* start in the first row */
+      /* walk every column in the range */
+      for(C = range.s.c; C <= range.e.c; ++C) {
+          var cell = sheet[xlReader.utils.encode_cell({c:C, r:R})] /* find the cell in the first row */
+  
+          var hdr = "UNKNOWN " + C; // <-- replace with your desired default 
+          if(cell && cell.t) hdr = xlReader.utils.format_cell(cell);
+  
+          headers.push(hdr);
+      }
+      return headers;
+  }
+    const wsname = xlFile.SheetNames[0]
+    const ws = xlFile.Sheets[wsname]
+    const header = get_header_row(ws)
+    //console.log(header)
+
+
+    //console.log(`${process.cwd()}/excelFile/TeacherList.xlsx`);
     const JsonObj = xlParser(xlFile);
     const JsonArray = JsonObj.ALL;
-	var count = 0;
+    var count = 0;
+    let nameOfTeacher,contact,courseCode,effExperience,teachingExperience,campusCode,program,email, academicQualification,year_part,jobType,subjectName;
+
+    //console.log(keys)
     
-    String.prototype.replaceAll = function (find, replace) {
-        var str = this;
-        return str.replace(new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), replace);
-    };
-
-    for (let i = 0; i < JsonArray.length; i++) {
-
-     // console.log("xx",JsonArray[0])
-      for (let key in JsonArray[i]){
-        if(key=='Course Code') 
-          JsonArray[i][key] = JsonArray[i][key].toString().replaceAll(" ","").replaceAll("'","")
-        else
-        JsonArray[i][key] = JsonArray[i][key].toString().replaceAll("'","")
+    
+    for (let key of header)
+    {
+      if((key.toLowerCase().includes("name")||key.toLowerCase().includes("teacher"))&&!key.toLowerCase().includes("subject"))
+      {
+        nameOfTeacher = key;
+      }
+      else if((key.toLowerCase().includes("contact")||key.toLowerCase().includes("mobile")))
+      {
+        contact = key;
+       
+      }
+      else if((key.toLowerCase().includes("course code")||key.toLowerCase().includes("subject code")))
+      {
+        courseCode = key;
         
       }
-      const getPerson = `SELECT * from person where name = '${
-        JsonArray[i]["Name of Teacher"]
+      else if(key.toLowerCase().includes("program"))
+      {
+        program = key;
+        
+      }
+      else if(key.toLowerCase().includes("teaching"))
+      {
+        teachingExperience = key;
+      
+      }
+      else if(key.toLowerCase().includes("eff"))
+      {
+        effExperience = key;
+        
+      }
+      else if(key.toLowerCase().includes("academic")&&key.toLowerCase().includes("qualification"))
+      {
+        academicQualification = key;
+       
+      }
+      else if(key.toLowerCase().includes("campus"))
+      {
+        campusCode = key;
+       
+      }
+      else if(key.toLowerCase().includes("email"))
+      {
+        email=key;
+        
+      }
+      else if(key.toLowerCase().includes("year")&&key.toLowerCase().includes("part"))
+      {
+        year_part = key;
+        
+      }
+      else if((key.toLowerCase().includes("job type")||key.toLowerCase().includes("type")||key.toLowerCase().includes("type of service")))
+      {
+        jobType = key;
+        
+      }
+      else if(key.toLowerCase().includes("subject"))
+      {
+        subjectName = key;
+        
+      }
+      else 
+      {
+        console.log("Not matched with any",key)
+      }
+
+  }
+  console.log(nameOfTeacher,contact,courseCode,effExperience,teachingExperience,campusCode,program,email, academicQualification,year_part,jobType,subjectName)
+  console.log(JsonArray[0][nameOfTeacher]) 
+  
+  for (let i = 0; i < JsonArray.length; i++) {
+      const getPerson = `SELECT * from person where name = "${
+        JsonArray[i][`${nameOfTeacher}`]
       }" and 
-        contact = "${JsonArray[i]["Mobile No."]}" and courseCode = "${
-        JsonArray[i]["Course Code"]
+        contact = "${JsonArray[i][contact]}" and courseCode = "${
+        JsonArray[i][courseCode]
       }"`;
       connection.query(getPerson, (err, result) => {
         if (err) throw err;
         else {
-          console.log(i, " ", result.length);
+          //console.log(i, " ", result.length);
           if (result.length == 0) {
             const newPerson = `INSERT INTO person(id, name, contact, courseCode,
                     programme, year_part, subject, campus, teachingExperience,experienceinthisSubj, academicQualification,
                     jobType, email) VALUES 
-                      (${null}, "${JsonArray[i]["Name of Teacher"]}", 
-                      "${JsonArray[i]["Mobile No."]}", "${
-              JsonArray[i]["Course Code"]
+                      (${null}, "${JsonArray[i][`${nameOfTeacher}`]}", 
+                      "${JsonArray[i][contact]}", "${
+              JsonArray[i][courseCode]
             }",
-                      "${JsonArray[i]["Programe"]}", "${
-              JsonArray[i]["Year/Part"]
-            }", "${JsonArray[i]["Subject"]}", "${
-              JsonArray[i]["1 Campus Code"]
+                      "${JsonArray[i][program]}", "${
+              JsonArray[i][year_part]
+            }", "${JsonArray[i][subjectName]}", "${
+              JsonArray[i][campusCode]
             }",
-                       "${JsonArray[i]["Teaching Experience"]}", "${
-              JsonArray[i]["Eff. Exp. On this Subj. "]
-            }", "${JsonArray[i]["Academic Qualification"]}",
+                       "${JsonArray[i][teachingExperience]}", "${
+              JsonArray[i][effExperience]
+            }", "${JsonArray[i][academicQualification]}",
                         "${
                           JsonArray[i][
-                            "Type of service: \r\n(Permanent/Contract/Part-time)"
+                            jobType
                           ]
-                        }", "${JsonArray[i]["Email"]}")`;
+                        }", "${JsonArray[i][email]}")`;
             connection.query(newPerson, (err, result) => {
               if (err) throw err;
               else {
@@ -390,7 +477,6 @@ pool.getConnection((err, connection) => {
 
       });
     }
-    res.status(200).send()
   });
   router.get("/initializeSubjects", async (req, res) => {
     const departmentList = [
@@ -462,7 +548,7 @@ pool.getConnection((err, connection) => {
               //   res.status(200).send(resp.data);
               console.log(subjectList);
 
-              const initializeSubjects = `INSERT INTO subject (courseCode, subjectName, year, part, programID) VALUES ?`;
+              const initializeSubjects = `INSERT INTO subject (courseCode, subjectName, year, part, programID) VALUES ?    `;
               connection.query(
                 initializeSubjects,
                 [subjectList],
